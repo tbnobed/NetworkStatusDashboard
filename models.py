@@ -11,6 +11,9 @@ class Server(db.Model):
     status = db.Column(db.String(20), default='unknown')  # up, down, unknown
     api_endpoint = db.Column(db.String(255))  # SRS API or NGINX status endpoint
     api_type = db.Column(db.String(20), default='srs')  # srs, nginx
+    api_token = db.Column(db.String(512))  # API authentication token/secret
+    api_username = db.Column(db.String(255))  # API username (if needed)
+    api_password = db.Column(db.String(255))  # API password (if needed)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     

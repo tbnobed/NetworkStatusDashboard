@@ -80,6 +80,35 @@
                         </div>
                     </div>
                     
+                    <div class="mb-3">
+                        <label for="api_token" class="form-label">API Token/Bearer Token</label>
+                        <input type="text" class="form-control" id="api_token" name="api_token" 
+                               value="{% if server %}{{ server.api_token }}{% endif %}"
+                               placeholder="Bearer token for API authentication">
+                        <div class="form-text">Authentication token (e.g., for SRS or other APIs requiring Bearer tokens)</div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="api_username" class="form-label">API Username</label>
+                                <input type="text" class="form-control" id="api_username" name="api_username" 
+                                       value="{% if server %}{{ server.api_username }}{% endif %}"
+                                       placeholder="Username (if required)">
+                                <div class="form-text">For basic authentication</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="api_password" class="form-label">API Password</label>
+                                <input type="password" class="form-control" id="api_password" name="api_password" 
+                                       value="{% if server %}{{ server.api_password }}{% endif %}"
+                                       placeholder="Password (if required)">
+                                <div class="form-text">For basic authentication</div>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <div class="row">
                         <div class="col">
                             <a href="{{ url_for('servers') }}" class="btn btn-secondary">

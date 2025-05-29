@@ -54,6 +54,9 @@ def add_server():
             role = request.form.get('role', '').strip()
             api_endpoint = request.form.get('api_endpoint', '').strip()
             api_type = request.form.get('api_type', 'srs').strip()
+            api_token = request.form.get('api_token', '').strip()
+            api_username = request.form.get('api_username', '').strip()
+            api_password = request.form.get('api_password', '').strip()
             
             # Validation
             if not hostname or not ip_address or not role:
@@ -77,7 +80,10 @@ def add_server():
                 port=port,
                 role=role,
                 api_endpoint=api_endpoint,
-                api_type=api_type
+                api_type=api_type,
+                api_token=api_token if api_token else None,
+                api_username=api_username if api_username else None,
+                api_password=api_password if api_password else None
             )
             
             db.session.add(server)
@@ -113,6 +119,9 @@ def edit_server(server_id):
             server.role = request.form.get('role', '').strip()
             server.api_endpoint = request.form.get('api_endpoint', '').strip()
             server.api_type = request.form.get('api_type', 'srs').strip()
+            server.api_token = request.form.get('api_token', '').strip() or None
+            server.api_username = request.form.get('api_username', '').strip() or None
+            server.api_password = request.form.get('api_password', '').strip() or None
             server.updated_at = datetime.utcnow()
             
             # Validation

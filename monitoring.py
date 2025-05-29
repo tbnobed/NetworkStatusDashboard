@@ -16,8 +16,17 @@ def test_server_connectivity(server):
         if server.api_endpoint:
             url = server.api_endpoint
         
+        # Prepare authentication headers
+        headers = {}
+        auth = None
+        
+        if server.api_token:
+            headers['Authorization'] = f'Bearer {server.api_token}'
+        elif server.api_username and server.api_password:
+            auth = (server.api_username, server.api_password)
+        
         start_time = time.time()
-        response = requests.get(url, timeout=10)
+        response = requests.get(url, headers=headers, auth=auth, timeout=10)
         response_time = (time.time() - start_time) * 1000  # Convert to milliseconds
         
         if response.status_code == 200:
