@@ -68,11 +68,21 @@ def get_server_metrics(server):
             logger.warning(f'No API endpoint configured for server {server.hostname}')
             return metrics
         
+        # Prepare authentication headers
+        headers = {}
+        auth = None
+        
+        if server.api_token:
+            headers['Authorization'] = f'Bearer {server.api_token}'
+        elif server.api_username and server.api_password:
+            auth = (server.api_username, server.api_password)
+        
         start_time = time.time()
         
         if server.api_type == 'srs':
             # SRS API format
-            response = requests.get(f"{server.api_endpoint}/api/v1/clients", timeout=10)
+            response = requests.get(f"{server.api_endpoint}/api/v1/clients", 
+                                  headers=headers, auth=auth, timeout=10)
             response_time = (time.time() - start_time) * 1000
             
             if response.status_code == 200:
@@ -84,7 +94,8 @@ def get_server_metrics(server):
                 
                 # Try to get system stats if available
                 try:
-                    stats_response = requests.get(f"{server.api_endpoint}/api/v1/summaries", timeout=5)
+                    stats_response = requests.get(f"{server.api_endpoint}/api/v1/summaries", 
+                                                headers=headers, auth=auth, timeout=5)
                     if stats_response.status_code == 200:
                         stats_data = stats_response.json()
                         # Parse SRS-specific stats if available
@@ -96,7 +107,7 @@ def get_server_metrics(server):
                     
         elif server.api_type == 'nginx':
             # NGINX stub_status format
-            response = requests.get(server.api_endpoint, timeout=10)
+            response = requests.get(server.api_endpoint, headers=headers, auth=auth, timeout=10)
             response_time = (time.time() - start_time) * 1000
             
             if response.status_code == 200:
@@ -115,7 +126,7 @@ def get_server_metrics(server):
         
         else:
             # Generic HTTP health check
-            response = requests.get(server.api_endpoint, timeout=10)
+            response = requests.get(server.api_endpoint, headers=headers, auth=auth, timeout=10)
             response_time = (time.time() - start_time) * 1000
             
             if response.status_code == 200:
