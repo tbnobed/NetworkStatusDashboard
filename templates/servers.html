@@ -61,20 +61,19 @@
                                     </span>
                                 </td>
                                 <td>
-                                    {% set latest_metric = server.metrics.order_by(server.metrics.order_by.desc().first()) %}
-                                    {% if latest_metric and latest_metric.active_connections is not none %}
-                                        <strong>{{ latest_metric.active_connections }}</strong>
-                                        {% if latest_metric.hls_connections %}
-                                            <small class="text-muted">({{ latest_metric.hls_connections }} HLS)</small>
+                                    {% if server.latest_metric and server.latest_metric.active_connections is not none %}
+                                        <strong>{{ server.latest_metric.active_connections }}</strong>
+                                        {% if server.latest_metric.hls_connections %}
+                                            <small class="text-muted">({{ server.latest_metric.hls_connections }} HLS)</small>
                                         {% endif %}
                                     {% else %}
                                         <span class="text-muted">N/A</span>
                                     {% endif %}
                                 </td>
                                 <td>
-                                    {% if latest_metric and latest_metric.response_time %}
-                                        <span class="badge bg-{{ 'success' if latest_metric.response_time < 1000 else 'warning' if latest_metric.response_time < 3000 else 'danger' }}">
-                                            {{ "%.0f"|format(latest_metric.response_time) }}ms
+                                    {% if server.latest_metric and server.latest_metric.response_time %}
+                                        <span class="badge bg-{{ 'success' if server.latest_metric.response_time < 1000 else 'warning' if server.latest_metric.response_time < 3000 else 'danger' }}">
+                                            {{ "%.0f"|format(server.latest_metric.response_time) }}ms
                                         </span>
                                     {% else %}
                                         <span class="text-muted">N/A</span>

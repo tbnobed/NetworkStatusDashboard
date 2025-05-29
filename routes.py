@@ -38,6 +38,9 @@ def dashboard():
 def servers():
     """Server management view"""
     servers = Server.query.all()
+    # Pre-fetch latest metrics for each server
+    for server in servers:
+        server.latest_metric = server.metrics.order_by(desc(ServerMetric.timestamp)).first()
     return render_template('servers.html', servers=servers)
 
 @app.route('/servers/add', methods=['GET', 'POST'])
