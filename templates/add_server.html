@@ -1,0 +1,200 @@
+{% extends "base.html" %}
+
+{% block title %}{% if edit_mode %}Edit{% else %}Add{% endif %} Server - CDN Monitor{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-{% if edit_mode %}edit{% else %}plus{% endif %} me-2"></i>
+                    {% if edit_mode %}Edit Server{% else %}Add New Server{% endif %}
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="hostname" class="form-label">Hostname *</label>
+                        <input type="text" class="form-control" id="hostname" name="hostname" 
+                               value="{% if server %}{{ server.hostname }}{% endif %}" required>
+                        <div class="form-text">Friendly name for the server (e.g., edge-dallas-01)</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="ip_address" class="form-label">IP Address *</label>
+                        <input type="text" class="form-control" id="ip_address" name="ip_address" 
+                               value="{% if server %}{{ server.ip_address }}{% endif %}" required
+                               pattern="^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$|^(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$">
+                        <div class="form-text">IPv4 or IPv6 address of the server</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="port" class="form-label">Port</label>
+                        <input type="number" class="form-control" id="port" name="port" 
+                               value="{% if server %}{{ server.port }}{% else %}80{% endif %}" 
+                               min="1" max="65535">
+                        <div class="form-text">Default port for server communication</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="role" class="form-label">Server Role *</label>
+                        <select class="form-select" id="role" name="role" required>
+                            <option value="">Select server role...</option>
+                            <option value="origin" {% if server and server.role == 'origin' %}selected{% endif %}>
+                                Origin Server
+                            </option>
+                            <option value="edge" {% if server and server.role == 'edge' %}selected{% endif %}>
+                                Edge Server
+                            </option>
+                            <option value="load-balancer" {% if server and server.role == 'load-balancer' %}selected{% endif %}>
+                                Load Balancer
+                            </option>
+                        </select>
+                        <div class="form-text">Role of this server in your CDN infrastructure</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="api_type" class="form-label">API Type</label>
+                        <select class="form-select" id="api_type" name="api_type" onchange="updateApiEndpointHelp()">
+                            <option value="srs" {% if not server or server.api_type == 'srs' %}selected{% endif %}>
+                                SRS Media Server
+                            </option>
+                            <option value="nginx" {% if server and server.api_type == 'nginx' %}selected{% endif %}>
+                                NGINX with stub_status
+                            </option>
+                            <option value="generic" {% if server and server.api_type == 'generic' %}selected{% endif %}>
+                                Generic HTTP Health Check
+                            </option>
+                        </select>
+                        <div class="form-text">Type of API endpoint for monitoring</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="api_endpoint" class="form-label">API Endpoint</label>
+                        <input type="url" class="form-control" id="api_endpoint" name="api_endpoint" 
+                               value="{% if server %}{{ server.api_endpoint }}{% endif %}"
+                               placeholder="http://example.com:1985">
+                        <div class="form-text" id="api-endpoint-help">
+                            Full URL to the monitoring API endpoint
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col">
+                            <a href="{{ url_for('servers') }}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-1"></i>Cancel
+                            </a>
+                        </div>
+                        <div class="col-auto">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-{% if edit_mode %}save{% else %}plus{% endif %} me-1"></i>
+                                {% if edit_mode %}Update Server{% else %}Add Server{% endif %}
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Help Section -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h6 class="card-title mb-0">
+                    <i class="fas fa-info-circle me-1"></i>Configuration Help
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <h6 class="text-primary">SRS Media Server</h6>
+                        <p class="small text-muted">
+                            For SRS media servers, use the HTTP API endpoint:
+                            <br><code>http://server:1985</code>
+                            <br>The system will query <code>/api/v1/clients</code> for connection data.
+                        </p>
+                    </div>
+                    <div class="col-md-4">
+                        <h6 class="text-success">NGINX Server</h6>
+                        <p class="small text-muted">
+                            For NGINX with stub_status module:
+                            <br><code>http://server/nginx_status</code>
+                            <br>Make sure stub_status is configured and accessible.
+                        </p>
+                    </div>
+                    <div class="col-md-4">
+                        <h6 class="text-info">Generic Health Check</h6>
+                        <p class="small text-muted">
+                            For generic HTTP health checks:
+                            <br><code>http://server/health</code>
+                            <br>Any HTTP 200 response indicates the server is healthy.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function updateApiEndpointHelp() {
+    const apiType = document.getElementById('api_type').value;
+    const helpElement = document.getElementById('api-endpoint-help');
+    const endpointInput = document.getElementById('api_endpoint');
+    
+    switch(apiType) {
+        case 'srs':
+            helpElement.innerHTML = 'SRS API endpoint (e.g., http://server:1985) - will query /api/v1/clients';
+            if (!endpointInput.value) {
+                endpointInput.placeholder = 'http://server:1985';
+            }
+            break;
+        case 'nginx':
+            helpElement.innerHTML = 'NGINX stub_status endpoint (e.g., http://server/nginx_status)';
+            if (!endpointInput.value) {
+                endpointInput.placeholder = 'http://server/nginx_status';
+            }
+            break;
+        case 'generic':
+            helpElement.innerHTML = 'Generic HTTP health check endpoint (e.g., http://server/health)';
+            if (!endpointInput.value) {
+                endpointInput.placeholder = 'http://server/health';
+            }
+            break;
+        default:
+            helpElement.innerHTML = 'Full URL to the monitoring API endpoint';
+            endpointInput.placeholder = 'http://example.com:1985';
+    }
+}
+
+// Initialize help text on page load
+document.addEventListener('DOMContentLoaded', function() {
+    updateApiEndpointHelp();
+});
+
+// Form validation
+document.querySelector('form').addEventListener('submit', function(e) {
+    const hostname = document.getElementById('hostname').value.trim();
+    const ipAddress = document.getElementById('ip_address').value.trim();
+    const role = document.getElementById('role').value;
+    
+    if (!hostname || !ipAddress || !role) {
+        e.preventDefault();
+        alert('Please fill in all required fields (marked with *).');
+        return false;
+    }
+    
+    // Validate IP address format
+    const ipv4Regex = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+    const ipv6Regex = /^(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$/;
+    
+    if (!ipv4Regex.test(ipAddress) && !ipv6Regex.test(ipAddress)) {
+        e.preventDefault();
+        alert('Please enter a valid IPv4 or IPv6 address.');
+        return false;
+    }
+});
+</script>
+{% endblock %}

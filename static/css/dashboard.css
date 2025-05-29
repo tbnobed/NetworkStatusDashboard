@@ -1,0 +1,303 @@
+:root {
+    --primary: 220 100% 50%; /* #0066FF */
+    --success: 120 100% 40%; /* #00CC00 */
+    --danger: 0 100% 50%; /* #FF0000 */
+    --warning: 45 100% 50%; /* #FFCC00 */
+    --info: 200 100% 50%; /* #0099FF */
+    --light: 210 11% 98%; /* #F5F7FA */
+    --dark: 210 11% 20%; /* #2C3E50 */
+    --muted: 210 11% 60%; /* #6C757D */
+    --background: 210 11% 98%; /* #F5F7FA */
+    --surface: 0 0% 100%; /* #FFFFFF */
+    --border: 210 11% 90%; /* #E1E8ED */
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background-color: hsl(var(--background));
+    color: hsl(var(--dark));
+}
+
+/* Custom card styling */
+.server-card {
+    border: 1px solid hsl(var(--border));
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.server-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Metric display styling */
+.metric-value {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: hsl(var(--primary));
+}
+
+.metric-label {
+    font-size: 0.75rem;
+    color: hsl(var(--muted));
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Status indicators */
+.status-up {
+    color: hsl(var(--success));
+}
+
+.status-down {
+    color: hsl(var(--danger));
+}
+
+.status-unknown {
+    color: hsl(var(--muted));
+}
+
+/* Role badges */
+.role-origin {
+    background-color: hsl(var(--primary) / 0.1);
+    color: hsl(var(--primary));
+    border: 1px solid hsl(var(--primary) / 0.3);
+}
+
+.role-edge {
+    background-color: hsl(var(--success) / 0.1);
+    color: hsl(var(--success));
+    border: 1px solid hsl(var(--success) / 0.3);
+}
+
+.role-load-balancer {
+    background-color: hsl(var(--warning) / 0.1);
+    color: hsl(var(--warning));
+    border: 1px solid hsl(var(--warning) / 0.3);
+}
+
+/* Navigation enhancements */
+.navbar-brand {
+    font-weight: 600;
+    font-size: 1.25rem;
+}
+
+.nav-link {
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.nav-link:hover {
+    transform: translateY(-1px);
+}
+
+/* Button enhancements */
+.btn {
+    font-weight: 500;
+    border-radius: 0.375rem;
+    transition: all 0.2s ease;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+}
+
+.btn-group-sm .btn {
+    font-size: 0.75rem;
+}
+
+/* Table enhancements */
+.table th {
+    font-weight: 600;
+    border-bottom: 2px solid hsl(var(--border));
+    color: hsl(var(--dark));
+}
+
+.table-hover tbody tr:hover {
+    background-color: hsl(var(--light));
+}
+
+/* Alert styling */
+.alert {
+    border: none;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.alert-success {
+    background-color: hsl(var(--success) / 0.1);
+    color: hsl(var(--success));
+    border-left: 4px solid hsl(var(--success));
+}
+
+.alert-danger {
+    background-color: hsl(var(--danger) / 0.1);
+    color: hsl(var(--danger));
+    border-left: 4px solid hsl(var(--danger));
+}
+
+.alert-warning {
+    background-color: hsl(var(--warning) / 0.1);
+    color: hsl(var(--warning));
+    border-left: 4px solid hsl(var(--warning));
+}
+
+.alert-info {
+    background-color: hsl(var(--info) / 0.1);
+    color: hsl(var(--info));
+    border-left: 4px solid hsl(var(--info));
+}
+
+/* Form enhancements */
+.form-control, .form-select {
+    border-radius: 0.375rem;
+    border: 1px solid hsl(var(--border));
+    transition: all 0.2s ease;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: hsl(var(--primary));
+    box-shadow: 0 0 0 0.2rem hsl(var(--primary) / 0.25);
+}
+
+.form-label {
+    font-weight: 500;
+    color: hsl(var(--dark));
+}
+
+.form-text {
+    color: hsl(var(--muted));
+}
+
+/* Modal enhancements */
+.modal-content {
+    border: none;
+    border-radius: 0.75rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+.modal-header {
+    border-bottom: 1px solid hsl(var(--border));
+    border-radius: 0.75rem 0.75rem 0 0;
+}
+
+/* Chart container styling */
+.chart-container {
+    position: relative;
+    height: 300px;
+    margin: 1rem 0;
+}
+
+/* Loading states */
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid hsl(var(--border));
+    border-top: 2px solid hsl(var(--primary));
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Responsive design improvements */
+@media (max-width: 768px) {
+    .metric-value {
+        font-size: 1rem;
+    }
+    
+    .server-card {
+        margin-bottom: 1rem;
+    }
+    
+    .btn-group-sm .btn {
+        padding: 0.25rem 0.5rem;
+    }
+    
+    .table-responsive {
+        font-size: 0.875rem;
+    }
+}
+
+/* Connection heatmap colors */
+.connection-low {
+    background-color: hsl(var(--success) / 0.3);
+    color: hsl(var(--success));
+}
+
+.connection-medium {
+    background-color: hsl(var(--warning) / 0.3);
+    color: hsl(var(--warning));
+}
+
+.connection-high {
+    background-color: hsl(var(--danger) / 0.3);
+    color: hsl(var(--danger));
+}
+
+/* Empty state styling */
+.empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+}
+
+.empty-state i {
+    font-size: 4rem;
+    color: hsl(var(--muted));
+    margin-bottom: 1rem;
+}
+
+.empty-state h4 {
+    color: hsl(var(--muted));
+    margin-bottom: 0.5rem;
+}
+
+.empty-state p {
+    color: hsl(var(--muted));
+    margin-bottom: 2rem;
+}
+
+/* Pulse animation for live data */
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.pulse {
+    animation: pulse 2s infinite;
+}
+
+/* Success states */
+.success-icon {
+    color: hsl(var(--success));
+}
+
+.error-icon {
+    color: hsl(var(--danger));
+}
+
+.warning-icon {
+    color: hsl(var(--warning));
+}
+
+.info-icon {
+    color: hsl(var(--info));
+}

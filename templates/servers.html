@@ -1,0 +1,254 @@
+{% extends "base.html" %}
+
+{% block title %}Servers - CDN Monitor{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h1 class="h2">
+            <i class="fas fa-server me-2"></i>Server Management
+        </h1>
+        <p class="text-muted">Manage your CDN infrastructure servers</p>
+    </div>
+    <div class="col-auto">
+        <a href="{{ url_for('add_server') }}" class="btn btn-primary">
+            <i class="fas fa-plus me-1"></i>Add Server
+        </a>
+    </div>
+</div>
+
+{% if servers %}
+    <div class="card">
+        <div class="card-header">
+            <h5 class="card-title mb-0">All Servers</h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Hostname</th>
+                            <th>Role</th>
+                            <th>Address</th>
+                            <th>Status</th>
+                            <th>Connections</th>
+                            <th>Response Time</th>
+                            <th>Last Updated</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for server in servers %}
+                            <tr>
+                                <td>
+                                    <strong>{{ server.hostname }}</strong>
+                                    {% if server.api_endpoint %}
+                                        <br><small class="text-muted">{{ server.api_type.upper() }} API</small>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="badge bg-{{ 'primary' if server.role == 'origin' else 'success' if server.role == 'edge' else 'warning' }}">
+                                        {{ server.role.title() }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <code>{{ server.ip_address }}:{{ server.port }}</code>
+                                </td>
+                                <td>
+                                    <span class="badge bg-{{ 'success' if server.status == 'up' else 'danger' if server.status == 'down' else 'secondary' }}">
+                                        <i class="fas fa-{{ 'check' if server.status == 'up' else 'times' if server.status == 'down' else 'question' }} me-1"></i>
+                                        {{ server.status.upper() }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% set latest_metric = server.metrics.order_by(server.metrics.order_by.desc().first()) %}
+                                    {% if latest_metric and latest_metric.active_connections is not none %}
+                                        <strong>{{ latest_metric.active_connections }}</strong>
+                                        {% if latest_metric.hls_connections %}
+                                            <small class="text-muted">({{ latest_metric.hls_connections }} HLS)</small>
+                                        {% endif %}
+                                    {% else %}
+                                        <span class="text-muted">N/A</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if latest_metric and latest_metric.response_time %}
+                                        <span class="badge bg-{{ 'success' if latest_metric.response_time < 1000 else 'warning' if latest_metric.response_time < 3000 else 'danger' }}">
+                                            {{ "%.0f"|format(latest_metric.response_time) }}ms
+                                        </span>
+                                    {% else %}
+                                        <span class="text-muted">N/A</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if server.updated_at %}
+                                        <small class="text-muted">{{ server.updated_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                                    {% else %}
+                                        <span class="text-muted">Never</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <form method="POST" action="{{ url_for('test_server', server_id=server.id) }}" style="display: inline;">
+                                            <button type="submit" class="btn btn-outline-info" title="Test Connectivity">
+                                                <i class="fas fa-plug"></i>
+                                            </button>
+                                        </form>
+                                        <a href="{{ url_for('edit_server', server_id=server.id) }}" class="btn btn-outline-primary" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <button type="button" class="btn btn-outline-danger" title="Delete" 
+                                                onclick="confirmDelete({{ server.id }}, '{{ server.hostname }}')">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Server Details Modal -->
+    <div class="modal fade" id="serverDetailsModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Server Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="server-details-content">
+                        <!-- Content will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+{% else %}
+    <div class="card">
+        <div class="card-body text-center py-5">
+            <i class="fas fa-server fa-4x text-muted mb-4"></i>
+            <h4 class="text-muted">No servers configured</h4>
+            <p class="text-muted mb-4">Add your first server to start monitoring your CDN infrastructure.</p>
+            <a href="{{ url_for('add_server') }}" class="btn btn-primary btn-lg">
+                <i class="fas fa-plus me-2"></i>Add Your First Server
+            </a>
+        </div>
+    </div>
+{% endif %}
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Deletion</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete the server <strong id="server-to-delete"></strong>?</p>
+                <p class="text-muted">This action cannot be undone and will remove all associated metrics and alerts.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form id="delete-form" method="POST" style="display: inline;">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash me-1"></i>Delete Server
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function confirmDelete(serverId, hostname) {
+    document.getElementById('server-to-delete').textContent = hostname;
+    document.getElementById('delete-form').action = `/servers/${serverId}/delete`;
+    
+    const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+    deleteModal.show();
+}
+
+function showServerDetails(serverId) {
+    fetch(`/api/servers/${serverId}/metrics`)
+        .then(response => response.json())
+        .then(metrics => {
+            const content = document.getElementById('server-details-content');
+            
+            if (metrics.length > 0) {
+                // Create a simple chart showing metrics over time
+                content.innerHTML = `
+                    <div class="row">
+                        <div class="col-md-6">
+                            <canvas id="metrics-chart" style="max-height: 300px;"></canvas>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Recent Metrics</h6>
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <tbody>
+                                        ${metrics.slice(0, 10).map(metric => `
+                                            <tr>
+                                                <td>${new Date(metric.timestamp).toLocaleString()}</td>
+                                                <td>${metric.active_connections || 0} connections</td>
+                                                <td>${metric.response_time ? Math.round(metric.response_time) + 'ms' : 'N/A'}</td>
+                                            </tr>
+                                        `).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // Create chart
+                const ctx = document.getElementById('metrics-chart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: metrics.slice(-24).map(m => new Date(m.timestamp).toLocaleTimeString()),
+                        datasets: [{
+                            label: 'Connections',
+                            data: metrics.slice(-24).map(m => m.active_connections || 0),
+                            borderColor: '#007bff',
+                            backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            } else {
+                content.innerHTML = '<p class="text-muted">No metrics available for this server.</p>';
+            }
+        })
+        .catch(error => {
+            console.error('Error loading server details:', error);
+            document.getElementById('server-details-content').innerHTML = 
+                '<p class="text-danger">Error loading server details.</p>';
+        });
+    
+    const modal = new bootstrap.Modal(document.getElementById('serverDetailsModal'));
+    modal.show();
+}
+
+// Auto-refresh table every 30 seconds
+setInterval(() => {
+    location.reload();
+}, 30000);
+</script>
+{% endblock %}

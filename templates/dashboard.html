@@ -1,0 +1,386 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - CDN Monitor{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h1 class="h2">
+            <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+        </h1>
+        <p class="text-muted">Real-time monitoring of your CDN infrastructure</p>
+    </div>
+    <div class="col-auto">
+        <button class="btn btn-outline-primary" onclick="refreshDashboard()">
+            <i class="fas fa-sync-alt me-1"></i>Refresh
+        </button>
+    </div>
+</div>
+
+<!-- Summary Cards -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title">Total Servers</h6>
+                        <h3 class="mb-0" id="total-servers">{{ stats.total_servers }}</h3>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-server fa-2x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title">Online</h6>
+                        <h3 class="mb-0" id="online-servers">{{ stats.online_servers }}</h3>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-check-circle fa-2x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card bg-danger text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title">Offline</h6>
+                        <h3 class="mb-0" id="offline-servers">{{ stats.offline_servers }}</h3>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-times-circle fa-2x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card bg-info text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title">Total Connections</h6>
+                        <h3 class="mb-0" id="total-connections">{{ stats.total_connections }}</h3>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-users fa-2x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Row -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Server Status Distribution</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="status-chart" style="max-height: 300px;"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Connections by Server</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="connections-chart" style="max-height: 300px;"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Server Grid -->
+<div class="row mb-4">
+    <div class="col">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">Server Overview</h5>
+                <a href="{{ url_for('servers') }}" class="btn btn-outline-primary btn-sm">
+                    <i class="fas fa-cog me-1"></i>Manage Servers
+                </a>
+            </div>
+            <div class="card-body">
+                {% if servers %}
+                    <div class="row" id="servers-grid">
+                        {% for server in servers %}
+                            <div class="col-md-6 col-lg-4 mb-3">
+                                <div class="card server-card" data-server-id="{{ server.id }}">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <h6 class="card-title mb-1">{{ server.hostname }}</h6>
+                                            <span class="badge bg-{{ 'success' if server.status == 'up' else 'danger' if server.status == 'down' else 'secondary' }}">
+                                                {{ server.status.upper() }}
+                                            </span>
+                                        </div>
+                                        
+                                        <p class="text-muted small mb-2">
+                                            <i class="fas fa-tag me-1"></i>{{ server.role.title() }}
+                                            <br>
+                                            <i class="fas fa-network-wired me-1"></i>{{ server.ip_address }}:{{ server.port }}
+                                        </p>
+                                        
+                                        <div class="row text-center">
+                                            <div class="col-6">
+                                                <div class="metric-value" data-metric="connections">
+                                                    {% if server.metrics.first() %}
+                                                        {{ server.metrics.first().active_connections or 0 }}
+                                                    {% else %}
+                                                        0
+                                                    {% endif %}
+                                                </div>
+                                                <div class="metric-label">Connections</div>
+                                            </div>
+                                            <div class="col-6">
+                                                <div class="metric-value" data-metric="response_time">
+                                                    {% if server.metrics.first() and server.metrics.first().response_time %}
+                                                        {{ "%.0f"|format(server.metrics.first().response_time) }}ms
+                                                    {% else %}
+                                                        N/A
+                                                    {% endif %}
+                                                </div>
+                                                <div class="metric-label">Response Time</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-server fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No servers configured</h5>
+                        <p class="text-muted">Add your first server to start monitoring your CDN infrastructure.</p>
+                        <a href="{{ url_for('add_server') }}" class="btn btn-primary">
+                            <i class="fas fa-plus me-1"></i>Add Server
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Alerts -->
+<div class="row">
+    <div class="col">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Recent Alerts</h5>
+            </div>
+            <div class="card-body">
+                {% if alerts %}
+                    <div class="list-group list-group-flush" id="alerts-list">
+                        {% for alert in alerts %}
+                            <div class="list-group-item d-flex justify-content-between align-items-start">
+                                <div class="ms-2 me-auto">
+                                    <div class="fw-bold">
+                                        <span class="badge bg-{{ 'danger' if alert.severity == 'critical' else 'warning' if alert.severity == 'warning' else 'info' }} me-2">
+                                            {{ alert.severity.upper() }}
+                                        </span>
+                                        {{ alert.message }}
+                                    </div>
+                                    <small class="text-muted">
+                                        {{ alert.created_at.strftime('%Y-%m-%d %H:%M:%S') }}
+                                    </small>
+                                </div>
+                                <button class="btn btn-sm btn-outline-secondary" onclick="acknowledgeAlert({{ alert.id }})">
+                                    <i class="fas fa-check me-1"></i>Acknowledge
+                                </button>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-3">
+                        <i class="fas fa-check-circle fa-2x text-success mb-2"></i>
+                        <p class="text-muted mb-0">No active alerts</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Initialize charts
+document.addEventListener('DOMContentLoaded', function() {
+    initializeCharts();
+    
+    // Auto-refresh every 30 seconds
+    setInterval(refreshDashboard, 30000);
+});
+
+function initializeCharts() {
+    // Status Distribution Chart
+    const statusCtx = document.getElementById('status-chart').getContext('2d');
+    window.statusChart = new Chart(statusCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Online', 'Offline', 'Unknown'],
+            datasets: [{
+                data: [{{ stats.online_servers }}, {{ stats.offline_servers }}, {{ stats.unknown_servers }}],
+                backgroundColor: ['#28a745', '#dc3545', '#6c757d'],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+    
+    // Connections Chart
+    const connectionsCtx = document.getElementById('connections-chart').getContext('2d');
+    const serverNames = [{% for server in servers %}'{{ server.hostname }}'{% if not loop.last %},{% endif %}{% endfor %}];
+    const connectionCounts = [{% for server in servers %}{{ server.metrics.first().active_connections if server.metrics.first() else 0 }}{% if not loop.last %},{% endif %}{% endfor %}];
+    
+    window.connectionsChart = new Chart(connectionsCtx, {
+        type: 'bar',
+        data: {
+            labels: serverNames,
+            datasets: [{
+                label: 'Active Connections',
+                data: connectionCounts,
+                backgroundColor: '#007bff',
+                borderColor: '#0056b3',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+}
+
+function refreshDashboard() {
+    // Refresh dashboard data
+    fetch('/api/dashboard/stats')
+        .then(response => response.json())
+        .then(data => {
+            // Update summary cards
+            document.getElementById('total-servers').textContent = data.total_servers;
+            document.getElementById('online-servers').textContent = data.status_counts.up || 0;
+            document.getElementById('offline-servers').textContent = data.status_counts.down || 0;
+            document.getElementById('total-connections').textContent = data.total_connections;
+            
+            // Update charts
+            if (window.statusChart) {
+                window.statusChart.data.datasets[0].data = [
+                    data.status_counts.up || 0,
+                    data.status_counts.down || 0,
+                    data.status_counts.unknown || 0
+                ];
+                window.statusChart.update();
+            }
+        })
+        .catch(error => {
+            console.error('Error refreshing dashboard:', error);
+        });
+    
+    // Refresh server grid
+    fetch('/api/servers')
+        .then(response => response.json())
+        .then(servers => {
+            updateServerGrid(servers);
+        })
+        .catch(error => {
+            console.error('Error refreshing servers:', error);
+        });
+}
+
+function updateServerGrid(servers) {
+    const grid = document.getElementById('servers-grid');
+    if (!grid) return;
+    
+    servers.forEach(server => {
+        const serverCard = document.querySelector(`[data-server-id="${server.id}"]`);
+        if (serverCard) {
+            // Update status badge
+            const statusBadge = serverCard.querySelector('.badge');
+            statusBadge.className = `badge bg-${server.status === 'up' ? 'success' : server.status === 'down' ? 'danger' : 'secondary'}`;
+            statusBadge.textContent = server.status.toUpperCase();
+            
+            // Update metrics
+            const connectionsMetric = serverCard.querySelector('[data-metric="connections"]');
+            if (connectionsMetric && server.latest_metric) {
+                connectionsMetric.textContent = server.latest_metric.active_connections || 0;
+            }
+            
+            const responseTimeMetric = serverCard.querySelector('[data-metric="response_time"]');
+            if (responseTimeMetric && server.latest_metric && server.latest_metric.response_time) {
+                responseTimeMetric.textContent = Math.round(server.latest_metric.response_time) + 'ms';
+            }
+        }
+    });
+}
+
+function acknowledgeAlert(alertId) {
+    fetch(`/api/alerts/${alertId}/acknowledge`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Remove the alert from the list
+            const alertElement = document.querySelector(`[onclick="acknowledgeAlert(${alertId})"]`).closest('.list-group-item');
+            alertElement.remove();
+            
+            // Check if no alerts remain
+            const alertsList = document.getElementById('alerts-list');
+            if (alertsList && alertsList.children.length === 0) {
+                alertsList.innerHTML = `
+                    <div class="text-center py-3">
+                        <i class="fas fa-check-circle fa-2x text-success mb-2"></i>
+                        <p class="text-muted mb-0">No active alerts</p>
+                    </div>
+                `;
+            }
+        }
+    })
+    .catch(error => {
+        console.error('Error acknowledging alert:', error);
+    });
+}
+</script>
+{% endblock %}
