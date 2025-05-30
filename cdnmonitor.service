@@ -1,0 +1,17 @@
+[Unit]
+Description=CDN Monitor Dashboard
+After=network.target postgresql.service
+
+[Service]
+Type=notify
+User=www-data
+Group=www-data
+WorkingDirectory=/opt/cdnmonitor
+Environment=PATH=/opt/cdnmonitor/venv/bin
+ExecStart=/opt/cdnmonitor/venv/bin/gunicorn --bind 127.0.0.1:5000 --workers 3 --timeout 120 main:app
+ExecReload=/bin/kill -s HUP $MAINPID
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
