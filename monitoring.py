@@ -98,15 +98,28 @@ def get_server_metrics(server):
                                                   headers=headers, auth=auth, timeout=5)
                     if streams_response.status_code == 200:
                         streams_data = streams_response.json()
+                        logger.debug(f'Streams data for {server.hostname}: {streams_data}')
                         
                         total_bandwidth_in = 0
                         total_bandwidth_out = 0
                         total_bytes_sent = 0
                         total_bytes_received = 0
                         
-                        # Parse SRS streams data for bandwidth metrics
+                        # Parse SRS streams data - check different possible structures
+                        streams_list = None
                         if 'streams' in streams_data:
-                            for stream in streams_data['streams']:
+                            streams_list = streams_data['streams']
+                        elif isinstance(streams_data, list):
+                            streams_list = streams_data
+                        elif 'data' in streams_data and 'streams' in streams_data['data']:
+                            streams_list = streams_data['data']['streams']
+                        
+                        if streams_list:
+                            logger.debug(f'Found {len(streams_list)} streams for {server.hostname}')
+                            for stream in streams_list:
+                                logger.debug(f'Stream data: {stream}')
+                                
+                                # Check for bandwidth data in various formats
                                 if 'kbps' in stream:
                                     kbps_data = stream['kbps']
                                     if 'recv_30s' in kbps_data:
@@ -127,6 +140,8 @@ def get_server_metrics(server):
                         metrics['bandwidth_out'] = total_bandwidth_out / 1000
                         metrics['bytes_received'] = total_bytes_received
                         metrics['bytes_sent'] = total_bytes_sent
+                        
+                        logger.debug(f'Bandwidth metrics for {server.hostname}: in={metrics["bandwidth_in"]}, out={metrics["bandwidth_out"]}')
                                     
                 except Exception as e:
                     logger.debug(f'Could not get streams data for {server.hostname}: {str(e)}')
