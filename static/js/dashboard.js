@@ -134,6 +134,13 @@ class CDNDashboard {
             responseTimeMetric.className = this.getResponseTimeClass(responseTime);
         }
         
+        // Update stream count metric
+        const streamCountMetric = card.querySelector('[data-metric="stream_count"]');
+        if (streamCountMetric && server.latest_metric) {
+            const streamCount = server.latest_metric.stream_count || 0;
+            streamCountMetric.textContent = streamCount;
+        }
+        
         // Update bandwidth metrics
         const bandwidthInMetric = card.querySelector('[data-metric="bandwidth_in"]');
         if (bandwidthInMetric && server.latest_metric) {
