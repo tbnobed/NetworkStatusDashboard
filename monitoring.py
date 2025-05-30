@@ -92,35 +92,71 @@ def get_server_metrics(server):
                 metrics['hls_connections'] = len([c for c in clients if c.get('type') == 'hls'])
                 metrics['response_time'] = response_time
                 
-                # Try to get system stats and bandwidth data
+                # Try to get bandwidth data from streams endpoint
                 try:
-                    stats_response = requests.get(f"{server.api_endpoint}/api/v1/summaries", 
-                                                headers=headers, auth=auth, timeout=5)
-                    if stats_response.status_code == 200:
-                        stats_data = stats_response.json()
+                    streams_response = requests.get(f"{server.api_endpoint}/api/v1/streams", 
+                                                  headers=headers, auth=auth, timeout=5)
+                    if streams_response.status_code == 200:
+                        streams_data = streams_response.json()
                         
-                        # Parse SRS bandwidth data
-                        if 'data' in stats_data and isinstance(stats_data['data'], dict):
-                            data_section = stats_data['data']
-                            
-                            # Extract bandwidth metrics from SRS summary
-                            if 'kbps' in data_section:
-                                kbps_data = data_section['kbps']
-                                if 'recv_30s' in kbps_data:
-                                    metrics['bandwidth_in'] = float(kbps_data['recv_30s']) / 1000  # Convert to Mbps
-                                if 'send_30s' in kbps_data:
-                                    metrics['bandwidth_out'] = float(kbps_data['send_30s']) / 1000  # Convert to Mbps
-                            
-                            # Extract total bytes if available
-                            if 'bytes' in data_section:
-                                bytes_data = data_section['bytes']
-                                if 'recv' in bytes_data:
-                                    metrics['bytes_received'] = int(bytes_data['recv'])
-                                if 'send' in bytes_data:
-                                    metrics['bytes_sent'] = int(bytes_data['send'])
+                        total_bandwidth_in = 0
+                        total_bandwidth_out = 0
+                        total_bytes_sent = 0
+                        total_bytes_received = 0
+                        
+                        # Parse SRS streams data for bandwidth metrics
+                        if 'streams' in streams_data:
+                            for stream in streams_data['streams']:
+                                if 'kbps' in stream:
+                                    kbps_data = stream['kbps']
+                                    if 'recv_30s' in kbps_data:
+                                        total_bandwidth_in += float(kbps_data['recv_30s'])
+                                    if 'send_30s' in kbps_data:
+                                        total_bandwidth_out += float(kbps_data['send_30s'])
+                                
+                                # Extract total bytes from streams
+                                if 'bytes' in stream:
+                                    bytes_data = stream['bytes']
+                                    if 'recv' in bytes_data:
+                                        total_bytes_received += int(bytes_data['recv'])
+                                    if 'send' in bytes_data:
+                                        total_bytes_sent += int(bytes_data['send'])
+                        
+                        # Convert kbps to Mbps and store metrics
+                        metrics['bandwidth_in'] = total_bandwidth_in / 1000
+                        metrics['bandwidth_out'] = total_bandwidth_out / 1000
+                        metrics['bytes_received'] = total_bytes_received
+                        metrics['bytes_sent'] = total_bytes_sent
                                     
                 except Exception as e:
-                    logger.debug(f'Could not parse bandwidth data for {server.hostname}: {str(e)}')
+                    logger.debug(f'Could not get streams data for {server.hostname}: {str(e)}')
+                    
+                    # Fallback to summaries endpoint for basic stats
+                    try:
+                        stats_response = requests.get(f"{server.api_endpoint}/api/v1/summaries", 
+                                                    headers=headers, auth=auth, timeout=5)
+                        if stats_response.status_code == 200:
+                            stats_data = stats_response.json()
+                            
+                            # Parse SRS bandwidth data from summaries as fallback
+                            if 'data' in stats_data and isinstance(stats_data['data'], dict):
+                                data_section = stats_data['data']
+                                
+                                if 'kbps' in data_section:
+                                    kbps_data = data_section['kbps']
+                                    if 'recv_30s' in kbps_data:
+                                        metrics['bandwidth_in'] = float(kbps_data['recv_30s']) / 1000
+                                    if 'send_30s' in kbps_data:
+                                        metrics['bandwidth_out'] = float(kbps_data['send_30s']) / 1000
+                                
+                                if 'bytes' in data_section:
+                                    bytes_data = data_section['bytes']
+                                    if 'recv' in bytes_data:
+                                        metrics['bytes_received'] = int(bytes_data['recv'])
+                                    if 'send' in bytes_data:
+                                        metrics['bytes_sent'] = int(bytes_data['send'])
+                    except Exception as e2:
+                        logger.debug(f'Could not get fallback stats for {server.hostname}: {str(e2)}')
                     
         elif server.api_type == 'nginx':
             # NGINX stub_status format
