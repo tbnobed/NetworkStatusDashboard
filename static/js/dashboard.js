@@ -133,6 +133,19 @@ class CDNDashboard {
             // Add color coding based on response time
             responseTimeMetric.className = this.getResponseTimeClass(responseTime);
         }
+        
+        // Update bandwidth metrics
+        const bandwidthInMetric = card.querySelector('[data-metric="bandwidth_in"]');
+        if (bandwidthInMetric && server.latest_metric) {
+            const bandwidthIn = server.latest_metric.bandwidth_in || 0;
+            bandwidthInMetric.textContent = bandwidthIn.toFixed(2);
+        }
+        
+        const bandwidthOutMetric = card.querySelector('[data-metric="bandwidth_out"]');
+        if (bandwidthOutMetric && server.latest_metric) {
+            const bandwidthOut = server.latest_metric.bandwidth_out || 0;
+            bandwidthOutMetric.textContent = bandwidthOut.toFixed(2);
+        }
     }
     
     updateAlerts(alerts) {
@@ -190,6 +203,28 @@ class CDNDashboard {
             window.connectionsChart.data.labels = serverNames;
             window.connectionsChart.data.datasets[0].data = connectionCounts;
             window.connectionsChart.update('none');
+        }
+        
+        // Update bandwidth chart
+        if (window.bandwidthChart) {
+            const serverNames = serversData.map(s => s.hostname);
+            const bandwidthIn = serversData.map(s => 
+                s.latest_metric ? s.latest_metric.bandwidth_in || 0 : 0
+            );
+            const bandwidthOut = serversData.map(s => 
+                s.latest_metric ? s.latest_metric.bandwidth_out || 0 : 0
+            );
+            
+            window.bandwidthChart.data.labels = serverNames;
+            window.bandwidthChart.data.datasets[0].data = bandwidthIn;
+            window.bandwidthChart.data.datasets[1].data = bandwidthOut;
+            window.bandwidthChart.update('none');
+        }
+        
+        // Update total bandwidth stat
+        const totalBandwidthElement = document.getElementById('total-bandwidth');
+        if (totalBandwidthElement && statsData.total_bandwidth !== undefined) {
+            totalBandwidthElement.textContent = statsData.total_bandwidth.toFixed(1) + ' Mbps';
         }
     }
     
