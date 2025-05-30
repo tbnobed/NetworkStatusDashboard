@@ -85,7 +85,8 @@ class CDNDashboard {
             'total-servers': data.total_servers,
             'online-servers': data.status_counts.up || 0,
             'offline-servers': data.status_counts.down || 0,
-            'total-connections': data.total_connections
+            'total-connections': data.total_connections,
+            'total-streams': data.total_streams || 0
         };
         
         Object.entries(elements).forEach(([id, value]) => {
@@ -94,6 +95,17 @@ class CDNDashboard {
                 this.animateNumber(element, parseInt(element.textContent) || 0, value);
             }
         });
+        
+        // Update bandwidth stats with decimal values
+        const totalBandwidthUpElement = document.getElementById('total-bandwidth-up');
+        if (totalBandwidthUpElement && data.total_bandwidth_up !== undefined) {
+            totalBandwidthUpElement.textContent = data.total_bandwidth_up.toFixed(1) + ' Mbps';
+        }
+        
+        const totalBandwidthDownElement = document.getElementById('total-bandwidth-down');
+        if (totalBandwidthDownElement && data.total_bandwidth_down !== undefined) {
+            totalBandwidthDownElement.textContent = data.total_bandwidth_down.toFixed(1) + ' Mbps';
+        }
     }
     
     updateServerGrid(servers) {
@@ -228,22 +240,7 @@ class CDNDashboard {
             window.bandwidthChart.update('none');
         }
         
-        // Update separate bandwidth stats
-        const totalBandwidthUpElement = document.getElementById('total-bandwidth-up');
-        if (totalBandwidthUpElement && statsData.total_bandwidth_up !== undefined) {
-            totalBandwidthUpElement.textContent = statsData.total_bandwidth_up.toFixed(1) + ' Mbps';
-        }
-        
-        const totalBandwidthDownElement = document.getElementById('total-bandwidth-down');
-        if (totalBandwidthDownElement && statsData.total_bandwidth_down !== undefined) {
-            totalBandwidthDownElement.textContent = statsData.total_bandwidth_down.toFixed(1) + ' Mbps';
-        }
-        
-        // Update stream count
-        const totalStreamsElement = document.getElementById('total-streams');
-        if (totalStreamsElement && statsData.total_streams !== undefined) {
-            totalStreamsElement.textContent = statsData.total_streams;
-        }
+
     }
     
     async showServerDetails(serverId) {
