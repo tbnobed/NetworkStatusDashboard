@@ -34,7 +34,9 @@ class CDNDashboard {
     
     startAutoRefresh() {
         // Refresh every 30 seconds
+        console.log('Starting auto-refresh every 30 seconds');
         this.refreshInterval = setInterval(() => {
+            console.log('Auto-refreshing dashboard...');
             this.refreshDashboard();
         }, 30000);
     }
@@ -81,6 +83,8 @@ class CDNDashboard {
     }
     
     updateStats(data) {
+        console.log('Updating stats with data:', data);
+        
         const elements = {
             'total-servers': data.total_servers,
             'online-servers': data.status_counts.up || 0,
@@ -92,6 +96,7 @@ class CDNDashboard {
         Object.entries(elements).forEach(([id, value]) => {
             const element = document.getElementById(id);
             if (element) {
+                console.log(`Updating ${id} from ${element.textContent} to ${value}`);
                 this.animateNumber(element, parseInt(element.textContent) || 0, value);
             }
         });
@@ -99,11 +104,13 @@ class CDNDashboard {
         // Update bandwidth stats with decimal values
         const totalBandwidthUpElement = document.getElementById('total-bandwidth-up');
         if (totalBandwidthUpElement && data.total_bandwidth_up !== undefined) {
+            console.log(`Updating bandwidth up from ${totalBandwidthUpElement.textContent} to ${data.total_bandwidth_up.toFixed(1)} Mbps`);
             totalBandwidthUpElement.textContent = data.total_bandwidth_up.toFixed(1) + ' Mbps';
         }
         
         const totalBandwidthDownElement = document.getElementById('total-bandwidth-down');
         if (totalBandwidthDownElement && data.total_bandwidth_down !== undefined) {
+            console.log(`Updating bandwidth down from ${totalBandwidthDownElement.textContent} to ${data.total_bandwidth_down.toFixed(1)} Mbps`);
             totalBandwidthDownElement.textContent = data.total_bandwidth_down.toFixed(1) + ' Mbps';
         }
     }
