@@ -1,17 +1,26 @@
 [Unit]
-Description=CDN Monitor Dashboard
+Description=CDN Monitoring Dashboard with Bandwidth & Stream Analytics
 After=network.target postgresql.service
+Requires=postgresql.service
 
 [Service]
-Type=notify
+Type=exec
 User=www-data
 Group=www-data
 WorkingDirectory=/opt/cdnmonitor
 Environment=PATH=/opt/cdnmonitor/venv/bin
-ExecStart=/opt/cdnmonitor/venv/bin/gunicorn --bind 127.0.0.1:5000 --workers 3 --timeout 120 main:app
+EnvironmentFile=/opt/cdnmonitor/.env
+ExecStart=/opt/cdnmonitor/venv/bin/gunicorn --bind 127.0.0.1:5000 --workers 4 --timeout 120 --reload main:app
 ExecReload=/bin/kill -s HUP $MAINPID
 Restart=always
 RestartSec=3
+
+# Security settings
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=/opt/cdnmonitor
+PrivateTmp=yes
 
 [Install]
 WantedBy=multi-user.target
