@@ -289,6 +289,9 @@ def collect_server_metrics():
         except Exception as e:
             logger.error(f'Error saving metrics to database: {str(e)}')
             db.session.rollback()
+            # Clear the session to force fresh metadata loading
+            db.session.close()
+            db.session.remove()
 
 def check_server_alerts(server, metrics_data):
     """Check for alert conditions and create alerts if necessary"""

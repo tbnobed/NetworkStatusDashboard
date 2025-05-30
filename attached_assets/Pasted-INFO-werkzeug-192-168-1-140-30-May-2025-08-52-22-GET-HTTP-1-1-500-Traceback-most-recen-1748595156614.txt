@@ -1,0 +1,66 @@
+INFO:werkzeug:192.168.1.140 - - [30/May/2025 08:52:22] "GET / HTTP/1.1" 500 -
+Traceback (most recent call last):
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/sqlalchemy/engine/base.py", line 1969, in _exec_single_context
+    self.dialect.do_execute(
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/sqlalchemy/engine/default.py", line 922, in do_execute
+    cursor.execute(statement, parameters)
+psycopg2.errors.UndefinedColumn: column server_metric.bytes_sent does not exist
+LINE 1: ...hls_connections AS server_metric_hls_connections, server_met...
+                                                             ^
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/flask/app.py", line 1478, in __call__
+    return self.wsgi_app(environ, start_response)
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/werkzeug/middleware/proxy_fix.py", line 182, in __call__
+    return self.app(environ, start_response)
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/flask/app.py", line 1458, in wsgi_app
+    response = self.handle_exception(e)
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/flask/app.py", line 1455, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/flask/app.py", line 869, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/flask/app.py", line 867, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/flask/app.py", line 852, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/opt/cdnmonitor/routes.py", line 27, in dashboard
+    latest_metric = server.metrics.order_by(desc(ServerMetric.timestamp)).first()
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/sqlalchemy/orm/query.py", line 2748, in first
+    return self.limit(1)._iter().first()  # type: ignore
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/sqlalchemy/orm/query.py", line 2847, in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/sqlalchemy/orm/session.py", line 2308, in execute
+    return self._execute_internal(
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/sqlalchemy/orm/session.py", line 2190, in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/sqlalchemy/orm/context.py", line 293, in orm_execute_statement
+    result = conn.execute(
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/sqlalchemy/engine/base.py", line 1416, in execute
+    return meth(
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/sqlalchemy/sql/elements.py", line 516, in _execute_on_connection
+    return connection._execute_clauseelement(
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/sqlalchemy/engine/base.py", line 1639, in _execute_clauseelement
+    ret = self._execute_context(
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/sqlalchemy/engine/base.py", line 1848, in _execute_context
+    return self._exec_single_context(
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/sqlalchemy/engine/base.py", line 1988, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/sqlalchemy/engine/base.py", line 2343, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/sqlalchemy/engine/base.py", line 1969, in _exec_single_context
+    self.dialect.do_execute(
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/sqlalchemy/engine/default.py", line 922, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.ProgrammingError: (psycopg2.errors.UndefinedColumn) column server_metric.bytes_sent does not exist
+LINE 1: ...hls_connections AS server_metric_hls_connections, server_met...
+                                                             ^
+
+[SQL: SELECT server_metric.id AS server_metric_id, server_metric.server_id AS server_metric_server_id, server_metric.timestamp AS server_metric_timestamp, server_metric.cpu_usage AS server_metric_cpu_usage, server_metric.memory_usage AS server_metric_memory_usage, server_metric.memory_total AS server_metric_memory_total, server_metric.memory_used AS server_metric_memory_used, server_metric.active_connections AS server_metric_active_connections, server_metric.hls_connections AS server_metric_hls_connections, server_metric.bytes_sent AS server_metric_bytes_sent, server_metric.bytes_received AS server_metric_bytes_received, server_metric.bandwidth_in AS server_metric_bandwidth_in, server_metric.bandwidth_out AS server_metric_bandwidth_out, server_metric.stream_count AS server_metric_stream_count, server_metric.uptime AS server_metric_uptime, server_metric.response_time AS server_metric_response_time, server_metric.error_count AS server_metric_error_count
+FROM server_metric
+WHERE %(param_1)s = server_metric.server_id ORDER BY server_metric.timestamp DESC
+ LIMIT %(param_2)s]
+[parameters: {'param_1': 1, 'param_2': 1}]
+(Background on this error at: https://sqlalche.me/e/20/f405)

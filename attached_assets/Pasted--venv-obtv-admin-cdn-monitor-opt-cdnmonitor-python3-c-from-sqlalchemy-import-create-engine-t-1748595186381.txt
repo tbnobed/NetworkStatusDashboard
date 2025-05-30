@@ -1,0 +1,328 @@
+(venv) obtv-admin@cdn-monitor:/opt/cdnmonitor$ python3 -c "
+from sqlalchemy import create_engine, text
+import os
+
+# Use your database URL
+db_url = 'postgresql://neondb_owner:npg_3gvyLfVEB1GW@ep-steep-wind-a5qt8u3t.us-east-2.aws.neon.tech/neondb?sslmode=require'
+engine = create_engine(db_url)
+
+# Add all missing columns
+missing_columns = [
+    'ALTER TABLE server_metric ADD COLUMN IF NOT EXISTS bytes_sent BIGINT DEFAULT 0',
+    'ALTER TABLE server_metric ADD COLUMN IF NOT EXISTS bytes_received BIGINT DEFAULT 0',
+    'ALTER TABLE server_metric ADD COLUMN IF NOT EXISTS bandwidth_in FLOAT DEFAULT 0',
+    'ALTER TABLE server_metric ADD COLUMN IF NOT EXISTS bandwidth_out FLOAT DEFAULT 0',
+    'ALTER TABLE server_metric ADD COLUMN IF NOT EXISTS stream_count INTEGER DEFAULT 0',
+    'ALTER TABLE server_metric ADD COLUMN IF NOT EXISTS uptime INTEGER',
+    'ALTER TABLE server_metric ADD COLUMN IF NOT EXISTS response_time FLOAT',
+    'ALTER TABLE server_metric ADD COLUMN IF NOT EXISTS error_count INTEGER DEFAULT 0'
+]
+
+with engine.connect() as conn:
+    for sql in missing_columns:
+        try:
+            conn.execute(text(sql))
+            print(f'Added column: {sql.split()[5]}')
+        except Exception as e:
+            print(f'Column {sql.split()[5]} already exists or error: {e}')
+    conn.commit()
+
+print('Database schema updated successfully')
+"^C
+(venv) obtv-admin@cdn-monitor:/opt/cdnmonitor$ python3 main.py
+DEBUG:tzlocal:/etc/timezone found, contents:
+ Etc/UTC
+
+DEBUG:tzlocal:/etc/localtime found
+DEBUG:tzlocal:2 found:
+ {'/etc/timezone': 'Etc/UTC', '/etc/localtime is a symlink to': 'Etc/UTC'}
+INFO:apscheduler.scheduler:Scheduler started
+DEBUG:apscheduler.scheduler:Looking for jobs to run
+DEBUG:apscheduler.scheduler:No jobs; waiting until a job is added
+INFO:apscheduler.scheduler:Added job "Collect server metrics" to job store "default"
+INFO:monitoring:Background monitoring started
+DEBUG:apscheduler.scheduler:Looking for jobs to run
+DEBUG:apscheduler.scheduler:Next wakeup is due at 2025-05-30 08:57:16.818616+00:00 (in 299.994126 seconds)
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 98.191.147.191:2022
+DEBUG:urllib3.connectionpool:http://98.191.147.191:2022 "GET / HTTP/1.1" 302 28
+DEBUG:urllib3.connectionpool:http://98.191.147.191:2022 "GET /mgmt HTTP/1.1" 200 952
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 98.191.147.191:2022
+DEBUG:urllib3.connectionpool:http://98.191.147.191:2022 "GET /api/v1/clients HTTP/1.1" 302 28
+DEBUG:urllib3.connectionpool:http://98.191.147.191:2022 "GET /api/v1/clients/ HTTP/1.1" 200 2802
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 98.191.147.191:2022
+DEBUG:urllib3.connectionpool:http://98.191.147.191:2022 "GET /api/v1/streams HTTP/1.1" 302 28
+DEBUG:urllib3.connectionpool:http://98.191.147.191:2022 "GET /api/v1/streams/ HTTP/1.1" 200 2447
+DEBUG:monitoring:Streams data for CDN3 Srv1: {'code': 0, 'server': 'vid-471ntv9', 'service': 'k217d29t', 'pid': '41', 'streams': [{'id': 'vid-44041gf', 'name': 'Plex48', 'vhost': 'vid-rbp9729', 'app': 'live', 'tcUrl': 'rtmp://cdn3.obedtv.live/live', 'url': '/live/Plex48', 'live_ms': 1748595136863, 'clients': 1, 'frames': 5146826, 'send_bytes': 8292831300, 'recv_bytes': 261296876262, 'kbps': {'recv_30s': 12002, 'send_30s': 0}, 'publish': {'active': True, 'cid': '561587x8'}, 'video': {'codec': 'H264', 'profile': 'Baseline', 'level': '5.1', 'width': 3840, 'height': 2160}, 'audio': {'codec': 'AAC', 'sample_rate': 44100, 'channel': 2, 'profile': 'LC'}}, {'id': 'vid-4p61829', 'name': 'Plex47', 'vhost': 'vid-rbp9729', 'app': 'live', 'tcUrl': 'rtmp://cdn3.obedtv.live/live', 'url': '/live/Plex47', 'live_ms': 1748595136863, 'clients': 1, 'frames': 10153277, 'send_bytes': 64168503, 'recv_bytes': 685052155879, 'kbps': {'recv_30s': 16148, 'send_30s': 0}, 'publish': {'active': True, 'cid': 'f41dc4t1'}, 'video': {'codec': 'H264', 'profile': 'High', 'level': '5.1', 'width': 3840, 'height': 2160}, 'audio': {'codec': 'AAC', 'sample_rate': 44100, 'channel': 2, 'profile': 'LC'}}, {'id': 'vid-5223z0w', 'name': 'tcl2', 'vhost': 'vid-rbp9729', 'app': 'live', 'tcUrl': 'rtmp://cdn3.obedtv.live/live', 'url': '/live/tcl2', 'live_ms': 1748595136863, 'clients': 2, 'frames': 20449840, 'send_bytes': 348771233258, 'recv_bytes': 348561048876, 'kbps': {'recv_30s': 8318, 'send_30s': 8330}, 'publish': {'active': True, 'cid': 'vb9znv7k'}, 'video': {'codec': 'H264', 'profile': 'High', 'level': 'Other', 'width': 1920, 'height': 1080}, 'audio': {'codec': 'AAC', 'sample_rate': 44100, 'channel': 2, 'profile': 'LC'}}, {'id': 'vid-945kaq6', 'name': 'Plex45', 'vhost': 'vid-rbp9729', 'app': 'live', 'tcUrl': 'rtmp://cdn3.obedtv.live/live', 'url': '/live/Plex45', 'live_ms': 1748595136863, 'clients': 1, 'frames': 10147647, 'send_bytes': 25493855250, 'recv_bytes': 685155727023, 'kbps': {'recv_30s': 16181, 'send_30s': 0}, 'publish': {'active': True, 'cid': '76h89q68'}, 'video': {'codec': 'H264', 'profile': 'High', 'level': '5.1', 'width': 3840, 'height': 2160}, 'audio': {'codec': 'AAC', 'sample_rate': 44100, 'channel': 2, 'profile': 'LC'}}, {'id': 'vid-ah1r6t2', 'name': 'Plex46', 'vhost': 'vid-rbp9729', 'app': 'live', 'tcUrl': 'rtmp://cdn3.obedtv.live/live', 'url': '/live/Plex46', 'live_ms': 1748595136863, 'clients': 3, 'frames': 10146592, 'send_bytes': 880991519222, 'recv_bytes': 685790882789, 'kbps': {'recv_30s': 16163, 'send_30s': 34701}, 'publish': {'active': True, 'cid': '01m947v2'}, 'video': {'codec': 'H264', 'profile': 'High', 'level': '5.1', 'width': 3840, 'height': 2160}, 'audio': {'codec': 'AAC', 'sample_rate': 44100, 'channel': 2, 'profile': 'LC'}}]}
+DEBUG:monitoring:Found 5 streams for CDN3 Srv1
+DEBUG:monitoring:Stream data: {'id': 'vid-44041gf', 'name': 'Plex48', 'vhost': 'vid-rbp9729', 'app': 'live', 'tcUrl': 'rtmp://cdn3.obedtv.live/live', 'url': '/live/Plex48', 'live_ms': 1748595136863, 'clients': 1, 'frames': 5146826, 'send_bytes': 8292831300, 'recv_bytes': 261296876262, 'kbps': {'recv_30s': 12002, 'send_30s': 0}, 'publish': {'active': True, 'cid': '561587x8'}, 'video': {'codec': 'H264', 'profile': 'Baseline', 'level': '5.1', 'width': 3840, 'height': 2160}, 'audio': {'codec': 'AAC', 'sample_rate': 44100, 'channel': 2, 'profile': 'LC'}}
+DEBUG:monitoring:Stream data: {'id': 'vid-4p61829', 'name': 'Plex47', 'vhost': 'vid-rbp9729', 'app': 'live', 'tcUrl': 'rtmp://cdn3.obedtv.live/live', 'url': '/live/Plex47', 'live_ms': 1748595136863, 'clients': 1, 'frames': 10153277, 'send_bytes': 64168503, 'recv_bytes': 685052155879, 'kbps': {'recv_30s': 16148, 'send_30s': 0}, 'publish': {'active': True, 'cid': 'f41dc4t1'}, 'video': {'codec': 'H264', 'profile': 'High', 'level': '5.1', 'width': 3840, 'height': 2160}, 'audio': {'codec': 'AAC', 'sample_rate': 44100, 'channel': 2, 'profile': 'LC'}}
+DEBUG:monitoring:Stream data: {'id': 'vid-5223z0w', 'name': 'tcl2', 'vhost': 'vid-rbp9729', 'app': 'live', 'tcUrl': 'rtmp://cdn3.obedtv.live/live', 'url': '/live/tcl2', 'live_ms': 1748595136863, 'clients': 2, 'frames': 20449840, 'send_bytes': 348771233258, 'recv_bytes': 348561048876, 'kbps': {'recv_30s': 8318, 'send_30s': 8330}, 'publish': {'active': True, 'cid': 'vb9znv7k'}, 'video': {'codec': 'H264', 'profile': 'High', 'level': 'Other', 'width': 1920, 'height': 1080}, 'audio': {'codec': 'AAC', 'sample_rate': 44100, 'channel': 2, 'profile': 'LC'}}
+DEBUG:monitoring:Stream data: {'id': 'vid-945kaq6', 'name': 'Plex45', 'vhost': 'vid-rbp9729', 'app': 'live', 'tcUrl': 'rtmp://cdn3.obedtv.live/live', 'url': '/live/Plex45', 'live_ms': 1748595136863, 'clients': 1, 'frames': 10147647, 'send_bytes': 25493855250, 'recv_bytes': 685155727023, 'kbps': {'recv_30s': 16181, 'send_30s': 0}, 'publish': {'active': True, 'cid': '76h89q68'}, 'video': {'codec': 'H264', 'profile': 'High', 'level': '5.1', 'width': 3840, 'height': 2160}, 'audio': {'codec': 'AAC', 'sample_rate': 44100, 'channel': 2, 'profile': 'LC'}}
+DEBUG:monitoring:Stream data: {'id': 'vid-ah1r6t2', 'name': 'Plex46', 'vhost': 'vid-rbp9729', 'app': 'live', 'tcUrl': 'rtmp://cdn3.obedtv.live/live', 'url': '/live/Plex46', 'live_ms': 1748595136863, 'clients': 3, 'frames': 10146592, 'send_bytes': 880991519222, 'recv_bytes': 685790882789, 'kbps': {'recv_30s': 16163, 'send_30s': 34701}, 'publish': {'active': True, 'cid': '01m947v2'}, 'video': {'codec': 'H264', 'profile': 'High', 'level': '5.1', 'width': 3840, 'height': 2160}, 'audio': {'codec': 'AAC', 'sample_rate': 44100, 'channel': 2, 'profile': 'LC'}}
+DEBUG:monitoring:Metrics for CDN3 Srv1: streams=5, in=68.812, out=43.031
+ERROR:monitoring:Error starting monitoring: This Session's transaction has been rolled back due to a previous exception during flush. To begin a new transaction with this Session, first issue Session.rollback(). Original exception was: (raised as a result of Query-invoked autoflush; consider using a session.no_autoflush block if this flush is occurring prematurely)
+(psycopg2.errors.UndefinedColumn) column "bytes_sent" of relation "server_metric" does not exist
+LINE 1: ...memory_used, active_connections, hls_connections, bytes_sent...
+                                                             ^
+
+[SQL: INSERT INTO server_metric (server_id, timestamp, cpu_usage, memory_usage, memory_total, memory_used, active_connections, hls_connections, bytes_sent, bytes_received, bandwidth_in, bandwidth_out, stream_count, uptime, response_time, error_count) VALUES (%(server_id)s, %(timestamp)s, %(cpu_usage)s, %(memory_usage)s, %(memory_total)s, %(memory_used)s, %(active_connections)s, %(hls_connections)s, %(bytes_sent)s, %(bytes_received)s, %(bandwidth_in)s, %(bandwidth_out)s, %(stream_count)s, %(uptime)s, %(response_time)s, %(error_count)s) RETURNING server_metric.id]
+[parameters: {'server_id': 1, 'timestamp': datetime.datetime(2025, 5, 30, 8, 52, 16, 888344), 'cpu_usage': None, 'memory_usage': None, 'memory_total': None, 'memory_used': None, 'active_connections': 8, 'hls_connections': 0, 'bytes_sent': 0, 'bytes_received': 0, 'bandwidth_in': 68.812, 'bandwidth_out': 43.031, 'stream_count': 5, 'uptime': None, 'response_time': 11.79361343383789, 'error_count': 0}]
+(Background on this error at: https://sqlalche.me/e/20/f405) (Background on this error at: https://sqlalche.me/e/20/7s2a)
+ * Serving Flask app 'app'
+ * Debug mode: on
+INFO:werkzeug:WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.203.56:5000
+INFO:werkzeug:Press CTRL+C to quit
+INFO:werkzeug: * Restarting with stat
+DEBUG:tzlocal:/etc/timezone found, contents:
+ Etc/UTC
+
+DEBUG:tzlocal:/etc/localtime found
+DEBUG:tzlocal:2 found:
+ {'/etc/timezone': 'Etc/UTC', '/etc/localtime is a symlink to': 'Etc/UTC'}
+INFO:apscheduler.scheduler:Scheduler started
+DEBUG:apscheduler.scheduler:Looking for jobs to run
+DEBUG:apscheduler.scheduler:No jobs; waiting until a job is added
+INFO:apscheduler.scheduler:Added job "Collect server metrics" to job store "default"
+INFO:monitoring:Background monitoring started
+DEBUG:apscheduler.scheduler:Looking for jobs to run
+DEBUG:apscheduler.scheduler:Next wakeup is due at 2025-05-30 08:57:17.888672+00:00 (in 299.993277 seconds)
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 98.191.147.191:2022
+DEBUG:urllib3.connectionpool:http://98.191.147.191:2022 "GET / HTTP/1.1" 302 28
+DEBUG:urllib3.connectionpool:http://98.191.147.191:2022 "GET /mgmt HTTP/1.1" 200 952
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 98.191.147.191:2022
+DEBUG:urllib3.connectionpool:http://98.191.147.191:2022 "GET /api/v1/clients HTTP/1.1" 302 28
+DEBUG:urllib3.connectionpool:http://98.191.147.191:2022 "GET /api/v1/clients/ HTTP/1.1" 200 2802
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 98.191.147.191:2022
+DEBUG:urllib3.connectionpool:http://98.191.147.191:2022 "GET /api/v1/streams HTTP/1.1" 302 28
+DEBUG:urllib3.connectionpool:http://98.191.147.191:2022 "GET /api/v1/streams/ HTTP/1.1" 200 2447
+DEBUG:monitoring:Streams data for CDN3 Srv1: {'code': 0, 'server': 'vid-471ntv9', 'service': 'k217d29t', 'pid': '41', 'streams': [{'id': 'vid-44041gf', 'name': 'Plex48', 'vhost': 'vid-rbp9729', 'app': 'live', 'tcUrl': 'rtmp://cdn3.obedtv.live/live', 'url': '/live/Plex48', 'live_ms': 1748595137976, 'clients': 1, 'frames': 5146826, 'send_bytes': 8292831300, 'recv_bytes': 261296876262, 'kbps': {'recv_30s': 12002, 'send_30s': 0}, 'publish': {'active': True, 'cid': '561587x8'}, 'video': {'codec': 'H264', 'profile': 'Baseline', 'level': '5.1', 'width': 3840, 'height': 2160}, 'audio': {'codec': 'AAC', 'sample_rate': 44100, 'channel': 2, 'profile': 'LC'}}, {'id': 'vid-4p61829', 'name': 'Plex47', 'vhost': 'vid-rbp9729', 'app': 'live', 'tcUrl': 'rtmp://cdn3.obedtv.live/live', 'url': '/live/Plex47', 'live_ms': 1748595137976, 'clients': 1, 'frames': 10153277, 'send_bytes': 64168503, 'recv_bytes': 685052155879, 'kbps': {'recv_30s': 16148, 'send_30s': 0}, 'publish': {'active': True, 'cid': 'f41dc4t1'}, 'video': {'codec': 'H264', 'profile': 'High', 'level': '5.1', 'width': 3840, 'height': 2160}, 'audio': {'codec': 'AAC', 'sample_rate': 44100, 'channel': 2, 'profile': 'LC'}}, {'id': 'vid-5223z0w', 'name': 'tcl2', 'vhost': 'vid-rbp9729', 'app': 'live', 'tcUrl': 'rtmp://cdn3.obedtv.live/live', 'url': '/live/tcl2', 'live_ms': 1748595137976, 'clients': 2, 'frames': 20450140, 'send_bytes': 348771233258, 'recv_bytes': 348561048876, 'kbps': {'recv_30s': 8318, 'send_30s': 8330}, 'publish': {'active': True, 'cid': 'vb9znv7k'}, 'video': {'codec': 'H264', 'profile': 'High', 'level': 'Other', 'width': 1920, 'height': 1080}, 'audio': {'codec': 'AAC', 'sample_rate': 44100, 'channel': 2, 'profile': 'LC'}}, {'id': 'vid-945kaq6', 'name': 'Plex45', 'vhost': 'vid-rbp9729', 'app': 'live', 'tcUrl': 'rtmp://cdn3.obedtv.live/live', 'url': '/live/Plex45', 'live_ms': 1748595137976, 'clients': 1, 'frames': 10147798, 'send_bytes': 25493855250, 'recv_bytes': 685155727023, 'kbps': {'recv_30s': 16181, 'send_30s': 0}, 'publish': {'active': True, 'cid': '76h89q68'}, 'video': {'codec': 'H264', 'profile': 'High', 'level': '5.1', 'width': 3840, 'height': 2160}, 'audio': {'codec': 'AAC', 'sample_rate': 44100, 'channel': 2, 'profile': 'LC'}}, {'id': 'vid-ah1r6t2', 'name': 'Plex46', 'vhost': 'vid-rbp9729', 'app': 'live', 'tcUrl': 'rtmp://cdn3.obedtv.live/live', 'url': '/live/Plex46', 'live_ms': 1748595137976, 'clients': 3, 'frames': 10146592, 'send_bytes': 881013673342, 'recv_bytes': 685790898283, 'kbps': {'recv_30s': 16163, 'send_30s': 34701}, 'publish': {'active': True, 'cid': '01m947v2'}, 'video': {'codec': 'H264', 'profile': 'High', 'level': '5.1', 'width': 3840, 'height': 2160}, 'audio': {'codec': 'AAC', 'sample_rate': 44100, 'channel': 2, 'profile': 'LC'}}]}
+DEBUG:monitoring:Found 5 streams for CDN3 Srv1
+DEBUG:monitoring:Stream data: {'id': 'vid-44041gf', 'name': 'Plex48', 'vhost': 'vid-rbp9729', 'app': 'live', 'tcUrl': 'rtmp://cdn3.obedtv.live/live', 'url': '/live/Plex48', 'live_ms': 1748595137976, 'clients': 1, 'frames': 5146826, 'send_bytes': 8292831300, 'recv_bytes': 261296876262, 'kbps': {'recv_30s': 12002, 'send_30s': 0}, 'publish': {'active': True, 'cid': '561587x8'}, 'video': {'codec': 'H264', 'profile': 'Baseline', 'level': '5.1', 'width': 3840, 'height': 2160}, 'audio': {'codec': 'AAC', 'sample_rate': 44100, 'channel': 2, 'profile': 'LC'}}
+DEBUG:monitoring:Stream data: {'id': 'vid-4p61829', 'name': 'Plex47', 'vhost': 'vid-rbp9729', 'app': 'live', 'tcUrl': 'rtmp://cdn3.obedtv.live/live', 'url': '/live/Plex47', 'live_ms': 1748595137976, 'clients': 1, 'frames': 10153277, 'send_bytes': 64168503, 'recv_bytes': 685052155879, 'kbps': {'recv_30s': 16148, 'send_30s': 0}, 'publish': {'active': True, 'cid': 'f41dc4t1'}, 'video': {'codec': 'H264', 'profile': 'High', 'level': '5.1', 'width': 3840, 'height': 2160}, 'audio': {'codec': 'AAC', 'sample_rate': 44100, 'channel': 2, 'profile': 'LC'}}
+DEBUG:monitoring:Stream data: {'id': 'vid-5223z0w', 'name': 'tcl2', 'vhost': 'vid-rbp9729', 'app': 'live', 'tcUrl': 'rtmp://cdn3.obedtv.live/live', 'url': '/live/tcl2', 'live_ms': 1748595137976, 'clients': 2, 'frames': 20450140, 'send_bytes': 348771233258, 'recv_bytes': 348561048876, 'kbps': {'recv_30s': 8318, 'send_30s': 8330}, 'publish': {'active': True, 'cid': 'vb9znv7k'}, 'video': {'codec': 'H264', 'profile': 'High', 'level': 'Other', 'width': 1920, 'height': 1080}, 'audio': {'codec': 'AAC', 'sample_rate': 44100, 'channel': 2, 'profile': 'LC'}}
+DEBUG:monitoring:Stream data: {'id': 'vid-945kaq6', 'name': 'Plex45', 'vhost': 'vid-rbp9729', 'app': 'live', 'tcUrl': 'rtmp://cdn3.obedtv.live/live', 'url': '/live/Plex45', 'live_ms': 1748595137976, 'clients': 1, 'frames': 10147798, 'send_bytes': 25493855250, 'recv_bytes': 685155727023, 'kbps': {'recv_30s': 16181, 'send_30s': 0}, 'publish': {'active': True, 'cid': '76h89q68'}, 'video': {'codec': 'H264', 'profile': 'High', 'level': '5.1', 'width': 3840, 'height': 2160}, 'audio': {'codec': 'AAC', 'sample_rate': 44100, 'channel': 2, 'profile': 'LC'}}
+DEBUG:monitoring:Stream data: {'id': 'vid-ah1r6t2', 'name': 'Plex46', 'vhost': 'vid-rbp9729', 'app': 'live', 'tcUrl': 'rtmp://cdn3.obedtv.live/live', 'url': '/live/Plex46', 'live_ms': 1748595137976, 'clients': 3, 'frames': 10146592, 'send_bytes': 881013673342, 'recv_bytes': 685790898283, 'kbps': {'recv_30s': 16163, 'send_30s': 34701}, 'publish': {'active': True, 'cid': '01m947v2'}, 'video': {'codec': 'H264', 'profile': 'High', 'level': '5.1', 'width': 3840, 'height': 2160}, 'audio': {'codec': 'AAC', 'sample_rate': 44100, 'channel': 2, 'profile': 'LC'}}
+DEBUG:monitoring:Metrics for CDN3 Srv1: streams=5, in=68.812, out=43.031
+ERROR:monitoring:Error starting monitoring: This Session's transaction has been rolled back due to a previous exception during flush. To begin a new transaction with this Session, first issue Session.rollback(). Original exception was: (raised as a result of Query-invoked autoflush; consider using a session.no_autoflush block if this flush is occurring prematurely)
+(psycopg2.errors.UndefinedColumn) column "bytes_sent" of relation "server_metric" does not exist
+LINE 1: ...memory_used, active_connections, hls_connections, bytes_sent...
+                                                             ^
+
+[SQL: INSERT INTO server_metric (server_id, timestamp, cpu_usage, memory_usage, memory_total, memory_used, active_connections, hls_connections, bytes_sent, bytes_received, bandwidth_in, bandwidth_out, stream_count, uptime, response_time, error_count) VALUES (%(server_id)s, %(timestamp)s, %(cpu_usage)s, %(memory_usage)s, %(memory_total)s, %(memory_used)s, %(active_connections)s, %(hls_connections)s, %(bytes_sent)s, %(bytes_received)s, %(bandwidth_in)s, %(bandwidth_out)s, %(stream_count)s, %(uptime)s, %(response_time)s, %(error_count)s) RETURNING server_metric.id]
+[parameters: {'server_id': 1, 'timestamp': datetime.datetime(2025, 5, 30, 8, 52, 18, 2750), 'cpu_usage': None, 'memory_usage': None, 'memory_total': None, 'memory_used': None, 'active_connections': 8, 'hls_connections': 0, 'bytes_sent': 0, 'bytes_received': 0, 'bandwidth_in': 68.812, 'bandwidth_out': 43.031, 'stream_count': 5, 'uptime': None, 'response_time': 16.67308807373047, 'error_count': 0}]
+(Background on this error at: https://sqlalche.me/e/20/f405) (Background on this error at: https://sqlalche.me/e/20/7s2a)
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 841-424-189
+INFO:werkzeug:192.168.1.140 - - [30/May/2025 08:52:20] "GET / HTTP/1.1" 500 -
+Traceback (most recent call last):
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/sqlalchemy/engine/base.py", line 1969, in _exec_single_context
+    self.dialect.do_execute(
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/sqlalchemy/engine/default.py", line 922, in do_execute
+    cursor.execute(statement, parameters)
+psycopg2.errors.UndefinedColumn: column server_metric.bytes_sent does not exist
+LINE 1: ...hls_connections AS server_metric_hls_connections, server_met...
+                                                             ^
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/flask/app.py", line 1478, in __call__
+    return self.wsgi_app(environ, start_response)
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/werkzeug/middleware/proxy_fix.py", line 182, in __call__
+    return self.app(environ, start_response)
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/flask/app.py", line 1458, in wsgi_app
+    response = self.handle_exception(e)
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/flask/app.py", line 1455, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/flask/app.py", line 869, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/flask/app.py", line 867, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/flask/app.py", line 852, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/opt/cdnmonitor/routes.py", line 27, in dashboard
+    latest_metric = server.metrics.order_by(desc(ServerMetric.timestamp)).first()
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/sqlalchemy/orm/query.py", line 2748, in first
+    return self.limit(1)._iter().first()  # type: ignore
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/sqlalchemy/orm/query.py", line 2847, in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/sqlalchemy/orm/session.py", line 2308, in execute
+    return self._execute_internal(
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/sqlalchemy/orm/session.py", line 2190, in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/sqlalchemy/orm/context.py", line 293, in orm_execute_statement
+    result = conn.execute(
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/sqlalchemy/engine/base.py", line 1416, in execute
+    return meth(
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/sqlalchemy/sql/elements.py", line 516, in _execute_on_connection
+    return connection._execute_clauseelement(
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/sqlalchemy/engine/base.py", line 1639, in _execute_clauseelement
+    ret = self._execute_context(
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/sqlalchemy/engine/base.py", line 1848, in _execute_context
+    return self._exec_single_context(
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/sqlalchemy/engine/base.py", line 1988, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/sqlalchemy/engine/base.py", line 2343, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/sqlalchemy/engine/base.py", line 1969, in _exec_single_context
+    self.dialect.do_execute(
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/sqlalchemy/engine/default.py", line 922, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.ProgrammingError: (psycopg2.errors.UndefinedColumn) column server_metric.bytes_sent does not exist
+LINE 1: ...hls_connections AS server_metric_hls_connections, server_met...
+                                                             ^
+
+[SQL: SELECT server_metric.id AS server_metric_id, server_metric.server_id AS server_metric_server_id, server_metric.timestamp AS server_metric_timestamp, server_metric.cpu_usage AS server_metric_cpu_usage, server_metric.memory_usage AS server_metric_memory_usage, server_metric.memory_total AS server_metric_memory_total, server_metric.memory_used AS server_metric_memory_used, server_metric.active_connections AS server_metric_active_connections, server_metric.hls_connections AS server_metric_hls_connections, server_metric.bytes_sent AS server_metric_bytes_sent, server_metric.bytes_received AS server_metric_bytes_received, server_metric.bandwidth_in AS server_metric_bandwidth_in, server_metric.bandwidth_out AS server_metric_bandwidth_out, server_metric.stream_count AS server_metric_stream_count, server_metric.uptime AS server_metric_uptime, server_metric.response_time AS server_metric_response_time, server_metric.error_count AS server_metric_error_count
+FROM server_metric
+WHERE %(param_1)s = server_metric.server_id ORDER BY server_metric.timestamp DESC
+ LIMIT %(param_2)s]
+[parameters: {'param_1': 1, 'param_2': 1}]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+INFO:werkzeug:192.168.1.140 - - [30/May/2025 08:52:21] "GET /?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.140 - - [30/May/2025 08:52:21] "GET /?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.140 - - [30/May/2025 08:52:21] "GET /?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.140 - - [30/May/2025 08:52:21] "GET /?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.140 - - [30/May/2025 08:52:21] "GET / HTTP/1.1" 500 -
+Traceback (most recent call last):
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/sqlalchemy/engine/base.py", line 1969, in _exec_single_context
+    self.dialect.do_execute(
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/sqlalchemy/engine/default.py", line 922, in do_execute
+    cursor.execute(statement, parameters)
+psycopg2.errors.UndefinedColumn: column server_metric.bytes_sent does not exist
+LINE 1: ...hls_connections AS server_metric_hls_connections, server_met...
+                                                             ^
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/flask/app.py", line 1478, in __call__
+    return self.wsgi_app(environ, start_response)
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/werkzeug/middleware/proxy_fix.py", line 182, in __call__
+    return self.app(environ, start_response)
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/flask/app.py", line 1458, in wsgi_app
+    response = self.handle_exception(e)
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/flask/app.py", line 1455, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/flask/app.py", line 869, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/flask/app.py", line 867, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/flask/app.py", line 852, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/opt/cdnmonitor/routes.py", line 27, in dashboard
+    latest_metric = server.metrics.order_by(desc(ServerMetric.timestamp)).first()
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/sqlalchemy/orm/query.py", line 2748, in first
+    return self.limit(1)._iter().first()  # type: ignore
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/sqlalchemy/orm/query.py", line 2847, in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/sqlalchemy/orm/session.py", line 2308, in execute
+    return self._execute_internal(
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/sqlalchemy/orm/session.py", line 2190, in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/sqlalchemy/orm/context.py", line 293, in orm_execute_statement
+    result = conn.execute(
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/sqlalchemy/engine/base.py", line 1416, in execute
+    return meth(
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/sqlalchemy/sql/elements.py", line 516, in _execute_on_connection
+    return connection._execute_clauseelement(
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/sqlalchemy/engine/base.py", line 1639, in _execute_clauseelement
+    ret = self._execute_context(
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/sqlalchemy/engine/base.py", line 1848, in _execute_context
+    return self._exec_single_context(
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/sqlalchemy/engine/base.py", line 1988, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/sqlalchemy/engine/base.py", line 2343, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/sqlalchemy/engine/base.py", line 1969, in _exec_single_context
+    self.dialect.do_execute(
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/sqlalchemy/engine/default.py", line 922, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.ProgrammingError: (psycopg2.errors.UndefinedColumn) column server_metric.bytes_sent does not exist
+LINE 1: ...hls_connections AS server_metric_hls_connections, server_met...
+                                                             ^
+
+[SQL: SELECT server_metric.id AS server_metric_id, server_metric.server_id AS server_metric_server_id, server_metric.timestamp AS server_metric_timestamp, server_metric.cpu_usage AS server_metric_cpu_usage, server_metric.memory_usage AS server_metric_memory_usage, server_metric.memory_total AS server_metric_memory_total, server_metric.memory_used AS server_metric_memory_used, server_metric.active_connections AS server_metric_active_connections, server_metric.hls_connections AS server_metric_hls_connections, server_metric.bytes_sent AS server_metric_bytes_sent, server_metric.bytes_received AS server_metric_bytes_received, server_metric.bandwidth_in AS server_metric_bandwidth_in, server_metric.bandwidth_out AS server_metric_bandwidth_out, server_metric.stream_count AS server_metric_stream_count, server_metric.uptime AS server_metric_uptime, server_metric.response_time AS server_metric_response_time, server_metric.error_count AS server_metric_error_count
+FROM server_metric
+WHERE %(param_1)s = server_metric.server_id ORDER BY server_metric.timestamp DESC
+ LIMIT %(param_2)s]
+[parameters: {'param_1': 1, 'param_2': 1}]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+INFO:werkzeug:192.168.1.140 - - [30/May/2025 08:52:21] "GET /?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.140 - - [30/May/2025 08:52:21] "GET /?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.140 - - [30/May/2025 08:52:21] "GET /?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.140 - - [30/May/2025 08:52:21] "GET /?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.140 - - [30/May/2025 08:52:22] "GET / HTTP/1.1" 500 -
+Traceback (most recent call last):
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/sqlalchemy/engine/base.py", line 1969, in _exec_single_context
+    self.dialect.do_execute(
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/sqlalchemy/engine/default.py", line 922, in do_execute
+    cursor.execute(statement, parameters)
+psycopg2.errors.UndefinedColumn: column server_metric.bytes_sent does not exist
+LINE 1: ...hls_connections AS server_metric_hls_connections, server_met...
+                                                             ^
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/flask/app.py", line 1478, in __call__
+    return self.wsgi_app(environ, start_response)
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/werkzeug/middleware/proxy_fix.py", line 182, in __call__
+    return self.app(environ, start_response)
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/flask/app.py", line 1458, in wsgi_app
+    response = self.handle_exception(e)
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/flask/app.py", line 1455, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/flask/app.py", line 869, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/flask/app.py", line 867, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/flask/app.py", line 852, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/opt/cdnmonitor/routes.py", line 27, in dashboard
+    latest_metric = server.metrics.order_by(desc(ServerMetric.timestamp)).first()
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/sqlalchemy/orm/query.py", line 2748, in first
+    return self.limit(1)._iter().first()  # type: ignore
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/sqlalchemy/orm/query.py", line 2847, in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/sqlalchemy/orm/session.py", line 2308, in execute
+    return self._execute_internal(
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/sqlalchemy/orm/session.py", line 2190, in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/sqlalchemy/orm/context.py", line 293, in orm_execute_statement
+    result = conn.execute(
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/sqlalchemy/engine/base.py", line 1416, in execute
+    return meth(
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/sqlalchemy/sql/elements.py", line 516, in _execute_on_connection
+    return connection._execute_clauseelement(
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/sqlalchemy/engine/base.py", line 1639, in _execute_clauseelement
+    ret = self._execute_context(
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/sqlalchemy/engine/base.py", line 1848, in _execute_context
+    return self._exec_single_context(
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/sqlalchemy/engine/base.py", line 1988, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/sqlalchemy/engine/base.py", line 2343, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/sqlalchemy/engine/base.py", line 1969, in _exec_single_context
+    self.dialect.do_execute(
+  File "/opt/cdnmonitor/venv/lib/python3.10/site-packages/sqlalchemy/engine/default.py", line 922, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.ProgrammingError: (psycopg2.errors.UndefinedColumn) column server_metric.bytes_sent does not exist
+LINE 1: ...hls_connections AS server_metric_hls_connections, server_met...
+                                                             ^
+
+[SQL: SELECT server_metric.id AS server_metric_id, server_metric.server_id AS server_metric_server_id, server_metric.timestamp AS server_metric_timestamp, server_metric.cpu_usage AS server_metric_cpu_usage, server_metric.memory_usage AS server_metric_memory_usage, server_metric.memory_total AS server_metric_memory_total, server_metric.memory_used AS server_metric_memory_used, server_metric.active_connections AS server_metric_active_connections, server_metric.hls_connections AS server_metric_hls_connections, server_metric.bytes_sent AS server_metric_bytes_sent, server_metric.bytes_received AS server_metric_bytes_received, server_metric.bandwidth_in AS server_metric_bandwidth_in, server_metric.bandwidth_out AS server_metric_bandwidth_out, server_metric.stream_count AS server_metric_stream_count, server_metric.uptime AS server_metric_uptime, server_metric.response_time AS server_metric_response_time, server_metric.error_count AS server_metric_error_count
+FROM server_metric
+WHERE %(param_1)s = server_metric.server_id ORDER BY server_metric.timestamp DESC
+ LIMIT %(param_2)s]
+[parameters: {'param_1': 1, 'param_2': 1}]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+INFO:werkzeug:192.168.1.140 - - [30/May/2025 08:52:22] "GET /?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.140 - - [30/May/2025 08:52:22] "GET /?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.140 - - [30/May/2025 08:52:22] "GET /?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1" 304 -
+INFO:werkzeug:192.168.1.140 - - [30/May/2025 08:52:22] "GET /?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1" 304 -
