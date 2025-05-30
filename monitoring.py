@@ -92,6 +92,29 @@ def get_server_metrics(server):
                 metrics['hls_connections'] = len([c for c in clients if c.get('type') == 'hls'])
                 metrics['response_time'] = response_time
                 
+                # Get system stats from summaries endpoint
+                try:
+                    summaries_response = requests.get(f"{server.api_endpoint}/api/v1/summaries", 
+                                                    headers=headers, auth=auth, timeout=5)
+                    if summaries_response.status_code == 200:
+                        summaries_data = summaries_response.json()
+                        
+                        # Extract CPU and memory from summaries
+                        if 'data' in summaries_data:
+                            data = summaries_data['data']
+                            if 'cpu' in data:
+                                metrics['cpu_usage'] = data['cpu'].get('percent')
+                            if 'memory' in data:
+                                memory_info = data['memory']
+                                memory_total = memory_info.get('rss', 0) + memory_info.get('total', 0)
+                                memory_used = memory_info.get('rss', 0)
+                                metrics['memory_total'] = memory_total
+                                metrics['memory_used'] = memory_used
+                                if memory_total > 0:
+                                    metrics['memory_usage'] = (memory_used / memory_total) * 100
+                except Exception as e:
+                    logger.debug(f'Could not get summaries for {server.hostname}: {e}')
+                
                 # Try to get bandwidth data from streams endpoint
                 try:
                     streams_response = requests.get(f"{server.api_endpoint}/api/v1/streams", 
@@ -370,11 +393,11 @@ def check_server_alerts(server, metrics_data):
 def start_monitoring(scheduler):
     """Start the background monitoring jobs"""
     try:
-        # Collect metrics every 5 minutes
+        # Collect metrics every 30 seconds
         scheduler.add_job(
             func=collect_server_metrics,
             trigger="interval",
-            minutes=5,
+            seconds=30,
             id='collect_metrics',
             name='Collect server metrics',
             replace_existing=True
