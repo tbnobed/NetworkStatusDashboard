@@ -54,6 +54,12 @@ class ServerMetric(db.Model):
     active_connections = db.Column(db.Integer, default=0)
     hls_connections = db.Column(db.Integer, default=0)
     
+    # Bandwidth metrics
+    bytes_sent = db.Column(db.BigInteger, default=0)  # Total bytes sent
+    bytes_received = db.Column(db.BigInteger, default=0)  # Total bytes received
+    bandwidth_in = db.Column(db.Float, default=0)  # Current incoming bandwidth in Mbps
+    bandwidth_out = db.Column(db.Float, default=0)  # Current outgoing bandwidth in Mbps
+    
     # Status metrics
     uptime = db.Column(db.Integer)  # Seconds
     response_time = db.Column(db.Float)  # Milliseconds
@@ -73,6 +79,10 @@ class ServerMetric(db.Model):
             'memory_used': self.memory_used,
             'active_connections': self.active_connections,
             'hls_connections': self.hls_connections,
+            'bytes_sent': self.bytes_sent,
+            'bytes_received': self.bytes_received,
+            'bandwidth_in': self.bandwidth_in,
+            'bandwidth_out': self.bandwidth_out,
             'uptime': self.uptime,
             'response_time': self.response_time,
             'error_count': self.error_count

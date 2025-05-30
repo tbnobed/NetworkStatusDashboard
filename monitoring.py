@@ -92,18 +92,35 @@ def get_server_metrics(server):
                 metrics['hls_connections'] = len([c for c in clients if c.get('type') == 'hls'])
                 metrics['response_time'] = response_time
                 
-                # Try to get system stats if available
+                # Try to get system stats and bandwidth data
                 try:
                     stats_response = requests.get(f"{server.api_endpoint}/api/v1/summaries", 
                                                 headers=headers, auth=auth, timeout=5)
                     if stats_response.status_code == 200:
                         stats_data = stats_response.json()
-                        # Parse SRS-specific stats if available
-                        if 'data' in stats_data:
-                            # This would depend on SRS API structure
-                            pass
-                except:
-                    pass
+                        
+                        # Parse SRS bandwidth data
+                        if 'data' in stats_data and isinstance(stats_data['data'], dict):
+                            data_section = stats_data['data']
+                            
+                            # Extract bandwidth metrics from SRS summary
+                            if 'kbps' in data_section:
+                                kbps_data = data_section['kbps']
+                                if 'recv_30s' in kbps_data:
+                                    metrics['bandwidth_in'] = float(kbps_data['recv_30s']) / 1000  # Convert to Mbps
+                                if 'send_30s' in kbps_data:
+                                    metrics['bandwidth_out'] = float(kbps_data['send_30s']) / 1000  # Convert to Mbps
+                            
+                            # Extract total bytes if available
+                            if 'bytes' in data_section:
+                                bytes_data = data_section['bytes']
+                                if 'recv' in bytes_data:
+                                    metrics['bytes_received'] = int(bytes_data['recv'])
+                                if 'send' in bytes_data:
+                                    metrics['bytes_sent'] = int(bytes_data['send'])
+                                    
+                except Exception as e:
+                    logger.debug(f'Could not parse bandwidth data for {server.hostname}: {str(e)}')
                     
         elif server.api_type == 'nginx':
             # NGINX stub_status format
