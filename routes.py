@@ -17,19 +17,28 @@ def dashboard():
     offline_servers = len([s for s in servers if s.status == 'down'])
     unknown_servers = len([s for s in servers if s.status == 'unknown'])
     
-    # Get total connections across all servers
+    # Get total connections and bandwidth across all servers
     total_connections = 0
+    total_bandwidth = 0
     for server in servers:
         latest_metric = server.metrics.order_by(desc(ServerMetric.timestamp)).first()
-        if latest_metric and latest_metric.active_connections:
-            total_connections += latest_metric.active_connections
+        if latest_metric:
+            if latest_metric.active_connections:
+                total_connections += latest_metric.active_connections
+            
+            # Add bandwidth data
+            if latest_metric.bandwidth_in:
+                total_bandwidth += latest_metric.bandwidth_in
+            if latest_metric.bandwidth_out:
+                total_bandwidth += latest_metric.bandwidth_out
     
     stats = {
         'total_servers': total_servers,
         'online_servers': online_servers,
         'offline_servers': offline_servers,
         'unknown_servers': unknown_servers,
-        'total_connections': total_connections
+        'total_connections': total_connections,
+        'total_bandwidth': total_bandwidth
     }
     
     return render_template('dashboard.html', servers=servers, alerts=recent_alerts, stats=stats)

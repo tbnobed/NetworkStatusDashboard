@@ -257,6 +257,10 @@ def collect_server_metrics():
                     memory_used=metrics_data.get('memory_used'),
                     active_connections=metrics_data.get('active_connections', 0),
                     hls_connections=metrics_data.get('hls_connections', 0),
+                    bytes_sent=metrics_data.get('bytes_sent', 0),
+                    bytes_received=metrics_data.get('bytes_received', 0),
+                    bandwidth_in=metrics_data.get('bandwidth_in', 0),
+                    bandwidth_out=metrics_data.get('bandwidth_out', 0),
                     uptime=metrics_data.get('uptime'),
                     response_time=metrics_data.get('response_time'),
                     error_count=metrics_data.get('error_count', 0)
