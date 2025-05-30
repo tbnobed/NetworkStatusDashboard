@@ -102,16 +102,28 @@ def get_server_metrics(server):
                         # Extract CPU and memory from summaries
                         if 'data' in summaries_data:
                             data = summaries_data['data']
-                            if 'cpu' in data:
-                                metrics['cpu_usage'] = data['cpu'].get('percent')
-                            if 'memory' in data:
-                                memory_info = data['memory']
-                                memory_total = memory_info.get('rss', 0) + memory_info.get('total', 0)
-                                memory_used = memory_info.get('rss', 0)
-                                metrics['memory_total'] = memory_total
-                                metrics['memory_used'] = memory_used
-                                if memory_total > 0:
-                                    metrics['memory_usage'] = (memory_used / memory_total) * 100
+                            
+                            # Get SRS process stats from 'self' section
+                            if 'self' in data:
+                                self_data = data['self']
+                                metrics['cpu_usage'] = self_data.get('cpu_percent', 0)
+                                metrics['memory_usage'] = self_data.get('mem_percent', 0)
+                                
+                            # Get system-wide memory info from 'system' section
+                            if 'system' in data:
+                                system_data = data['system']
+                                # Memory in KB, convert to bytes
+                                mem_ram_kb = system_data.get('mem_ram_kbyte', 0)
+                                metrics['memory_total'] = mem_ram_kb * 1024
+                                
+                                # Calculate used memory from percentage and total
+                                if metrics['memory_usage'] and mem_ram_kb:
+                                    metrics['memory_used'] = int(mem_ram_kb * 1024 * (metrics['memory_usage'] / 100))
+                                
+                                # System uptime
+                                metrics['uptime'] = int(system_data.get('uptime', 0))
+                                
+                        logger.debug(f'CPU/Memory stats for {server.hostname}: CPU={metrics["cpu_usage"]}%, Memory={metrics["memory_usage"]}%')
                 except Exception as e:
                     logger.debug(f'Could not get summaries for {server.hostname}: {e}')
                 
