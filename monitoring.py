@@ -116,8 +116,14 @@ def get_server_metrics(server):
                         
                         if streams_list:
                             logger.debug(f'Found {len(streams_list)} streams for {server.hostname}')
+                            active_streams = 0
+                            
                             for stream in streams_list:
                                 logger.debug(f'Stream data: {stream}')
+                                
+                                # Count active streams
+                                if stream.get('publish', {}).get('active', False):
+                                    active_streams += 1
                                 
                                 # Check for bandwidth data in various formats
                                 if 'kbps' in stream:
@@ -134,6 +140,9 @@ def get_server_metrics(server):
                                         total_bytes_received += int(bytes_data['recv'])
                                     if 'send' in bytes_data:
                                         total_bytes_sent += int(bytes_data['send'])
+                            
+                            # Store stream count
+                            metrics['stream_count'] = active_streams
                         
                         # Convert kbps to Mbps and store metrics
                         metrics['bandwidth_in'] = total_bandwidth_in / 1000
@@ -141,7 +150,7 @@ def get_server_metrics(server):
                         metrics['bytes_received'] = total_bytes_received
                         metrics['bytes_sent'] = total_bytes_sent
                         
-                        logger.debug(f'Bandwidth metrics for {server.hostname}: in={metrics["bandwidth_in"]}, out={metrics["bandwidth_out"]}')
+                        logger.debug(f'Metrics for {server.hostname}: streams={metrics.get("stream_count", 0)}, in={metrics["bandwidth_in"]}, out={metrics["bandwidth_out"]}')
                                     
                 except Exception as e:
                     logger.debug(f'Could not get streams data for {server.hostname}: {str(e)}')
@@ -261,6 +270,7 @@ def collect_server_metrics():
                     bytes_received=metrics_data.get('bytes_received', 0),
                     bandwidth_in=metrics_data.get('bandwidth_in', 0),
                     bandwidth_out=metrics_data.get('bandwidth_out', 0),
+                    stream_count=metrics_data.get('stream_count', 0),
                     uptime=metrics_data.get('uptime'),
                     response_time=metrics_data.get('response_time'),
                     error_count=metrics_data.get('error_count', 0)

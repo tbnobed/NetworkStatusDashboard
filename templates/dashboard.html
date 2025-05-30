@@ -88,11 +88,45 @@
             <div class="card-body">
                 <div class="d-flex justify-content-between">
                     <div>
-                        <h6 class="card-title">Total Bandwidth</h6>
-                        <h3 class="mb-0" id="total-bandwidth">{{ "%.1f"|format(stats.total_bandwidth or 0) }} Mbps</h3>
+                        <h6 class="card-title">Bandwidth Up</h6>
+                        <h3 class="mb-0" id="total-bandwidth-up">{{ "%.1f"|format(stats.total_bandwidth_up or 0) }} Mbps</h3>
                     </div>
                     <div class="align-self-center">
-                        <i class="fas fa-tachometer-alt fa-2x opacity-50"></i>
+                        <i class="fas fa-arrow-up fa-2x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title">Bandwidth Down</h6>
+                        <h3 class="mb-0" id="total-bandwidth-down">{{ "%.1f"|format(stats.total_bandwidth_down or 0) }} Mbps</h3>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-arrow-down fa-2x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card bg-warning text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title">Total Streams</h6>
+                        <h3 class="mb-0" id="total-streams">{{ stats.total_streams or 0 }}</h3>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-video fa-2x opacity-50"></i>
                     </div>
                 </div>
             </div>

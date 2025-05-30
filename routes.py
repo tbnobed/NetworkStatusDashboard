@@ -17,20 +17,27 @@ def dashboard():
     offline_servers = len([s for s in servers if s.status == 'down'])
     unknown_servers = len([s for s in servers if s.status == 'unknown'])
     
-    # Get total connections and bandwidth across all servers
+    # Get total connections, bandwidth, and streams across all servers
     total_connections = 0
-    total_bandwidth = 0
+    total_bandwidth_up = 0
+    total_bandwidth_down = 0
+    total_streams = 0
+    
     for server in servers:
         latest_metric = server.metrics.order_by(desc(ServerMetric.timestamp)).first()
         if latest_metric:
             if latest_metric.active_connections:
                 total_connections += latest_metric.active_connections
             
-            # Add bandwidth data
+            # Add separate upload/download bandwidth
             if latest_metric.bandwidth_in:
-                total_bandwidth += latest_metric.bandwidth_in
+                total_bandwidth_down += latest_metric.bandwidth_in
             if latest_metric.bandwidth_out:
-                total_bandwidth += latest_metric.bandwidth_out
+                total_bandwidth_up += latest_metric.bandwidth_out
+                
+            # Add stream count
+            if latest_metric.stream_count:
+                total_streams += latest_metric.stream_count
     
     stats = {
         'total_servers': total_servers,
@@ -38,7 +45,9 @@ def dashboard():
         'offline_servers': offline_servers,
         'unknown_servers': unknown_servers,
         'total_connections': total_connections,
-        'total_bandwidth': total_bandwidth
+        'total_bandwidth_up': total_bandwidth_up,
+        'total_bandwidth_down': total_bandwidth_down,
+        'total_streams': total_streams
     }
     
     return render_template('dashboard.html', servers=servers, alerts=recent_alerts, stats=stats)
@@ -245,7 +254,9 @@ def api_dashboard_stats():
     status_counts = {'up': 0, 'down': 0, 'unknown': 0}
     role_counts = {'origin': 0, 'edge': 0, 'load-balancer': 0}
     total_connections = 0
-    total_bandwidth = 0
+    total_bandwidth_up = 0
+    total_bandwidth_down = 0
+    total_streams = 0
     
     for server in servers:
         status_counts[server.status] = status_counts.get(server.status, 0) + 1
@@ -257,16 +268,22 @@ def api_dashboard_stats():
             if latest_metric.active_connections:
                 total_connections += latest_metric.active_connections
             
-            # Add bandwidth data
+            # Add separate upload/download bandwidth
             if latest_metric.bandwidth_in:
-                total_bandwidth += latest_metric.bandwidth_in
+                total_bandwidth_down += latest_metric.bandwidth_in
             if latest_metric.bandwidth_out:
-                total_bandwidth += latest_metric.bandwidth_out
+                total_bandwidth_up += latest_metric.bandwidth_out
+                
+            # Add stream count
+            if latest_metric.stream_count:
+                total_streams += latest_metric.stream_count
     
     return jsonify({
         'total_servers': len(servers),
         'status_counts': status_counts,
         'role_counts': role_counts,
         'total_connections': total_connections,
-        'total_bandwidth': total_bandwidth
+        'total_bandwidth_up': total_bandwidth_up,
+        'total_bandwidth_down': total_bandwidth_down,
+        'total_streams': total_streams
     })

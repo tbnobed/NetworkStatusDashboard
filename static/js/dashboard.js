@@ -221,10 +221,21 @@ class CDNDashboard {
             window.bandwidthChart.update('none');
         }
         
-        // Update total bandwidth stat
-        const totalBandwidthElement = document.getElementById('total-bandwidth');
-        if (totalBandwidthElement && statsData.total_bandwidth !== undefined) {
-            totalBandwidthElement.textContent = statsData.total_bandwidth.toFixed(1) + ' Mbps';
+        // Update separate bandwidth stats
+        const totalBandwidthUpElement = document.getElementById('total-bandwidth-up');
+        if (totalBandwidthUpElement && statsData.total_bandwidth_up !== undefined) {
+            totalBandwidthUpElement.textContent = statsData.total_bandwidth_up.toFixed(1) + ' Mbps';
+        }
+        
+        const totalBandwidthDownElement = document.getElementById('total-bandwidth-down');
+        if (totalBandwidthDownElement && statsData.total_bandwidth_down !== undefined) {
+            totalBandwidthDownElement.textContent = statsData.total_bandwidth_down.toFixed(1) + ' Mbps';
+        }
+        
+        // Update stream count
+        const totalStreamsElement = document.getElementById('total-streams');
+        if (totalStreamsElement && statsData.total_streams !== undefined) {
+            totalStreamsElement.textContent = statsData.total_streams;
         }
     }
     

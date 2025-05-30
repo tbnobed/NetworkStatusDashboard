@@ -59,6 +59,7 @@ class ServerMetric(db.Model):
     bytes_received = db.Column(db.BigInteger, default=0)  # Total bytes received
     bandwidth_in = db.Column(db.Float, default=0)  # Current incoming bandwidth in Mbps
     bandwidth_out = db.Column(db.Float, default=0)  # Current outgoing bandwidth in Mbps
+    stream_count = db.Column(db.Integer, default=0)  # Number of active streams
     
     # Status metrics
     uptime = db.Column(db.Integer)  # Seconds
@@ -83,6 +84,7 @@ class ServerMetric(db.Model):
             'bytes_received': self.bytes_received,
             'bandwidth_in': self.bandwidth_in,
             'bandwidth_out': self.bandwidth_out,
+            'stream_count': self.stream_count,
             'uptime': self.uptime,
             'response_time': self.response_time,
             'error_count': self.error_count
