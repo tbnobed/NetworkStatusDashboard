@@ -17,8 +17,8 @@
     </div>
 </div>
 
-<!-- Summary Cards -->
-<div class="row mb-4">
+<!-- Summary Cards - Row 1 -->
+<div class="row mb-3">
     <div class="col-md-3">
         <div class="card bg-primary text-white">
             <div class="card-body">
@@ -82,7 +82,10 @@
             </div>
         </div>
     </div>
-    
+</div>
+
+<!-- Summary Cards - Row 2 -->
+<div class="row mb-5">
     <div class="col-md-3">
         <div class="card bg-success text-white">
             <div class="card-body">
@@ -114,16 +117,14 @@
             </div>
         </div>
     </div>
-</div>
-
-<div class="row mb-4">
+    
     <div class="col-md-3">
         <div class="card bg-warning text-white">
             <div class="card-body">
                 <div class="d-flex justify-content-between">
                     <div>
                         <h6 class="card-title">Total Streams</h6>
-                        <h3 class="mb-0" id="total-streams">{{ stats.total_streams or 0 }}</h3>
+                        <h3 class="mb-0" id="total-streams">{{ stats.total_streams }}</h3>
                     </div>
                     <div class="align-self-center">
                         <i class="fas fa-video fa-2x opacity-50"></i>
@@ -133,6 +134,8 @@
         </div>
     </div>
 </div>
+
+
 
 <!-- Charts Row -->
 <div class="row mb-4">
