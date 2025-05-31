@@ -62,6 +62,7 @@ class CDNDashboard {
             
             // Update dashboard components
             this.updateStats(statsData);
+            console.log('About to update server grid with data:', serversData);
             this.updateServerGrid(serversData);
             this.updateAlerts(alertsData);
             this.updateCharts(statsData, serversData);
@@ -122,9 +123,12 @@ class CDNDashboard {
         const grid = document.getElementById('servers-grid');
         if (!grid) return;
         
+        console.log('Updating server grid with servers:', servers);
         servers.forEach(server => {
             const serverCard = document.querySelector(`[data-server-id="${server.id}"]`);
+            console.log(`Looking for server card with ID ${server.id}:`, serverCard);
             if (serverCard) {
+                console.log(`Updating server card for ${server.hostname} with connections:`, server.latest_metric?.active_connections);
                 this.updateServerCard(serverCard, server);
             }
         });
