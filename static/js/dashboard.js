@@ -317,7 +317,7 @@ class CDNDashboard {
         }
     }
     
-    generateServerDetailsContent(server, metrics) {
+    generateServerDetailsContent(server, metrics, streams) {
         const latestMetric = metrics[0];
         
         return `
@@ -344,6 +344,55 @@ class CDNDashboard {
                     ` : '<p class="text-muted">No metrics available</p>'}
                 </div>
             </div>
+            
+            ${streams && streams.streams && streams.streams.length > 0 ? `
+                <div class="row mb-4">
+                    <div class="col">
+                        <h6>Active Streams (${streams.total_streams} streams, ${streams.total_clients} total clients)</h6>
+                        <div class="table-responsive">
+                            <table class="table table-sm table-striped">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Stream Name</th>
+                                        <th>App</th>
+                                        <th>Clients</th>
+                                        <th>Video</th>
+                                        <th>Audio</th>
+                                        <th>Bandwidth In</th>
+                                        <th>Bandwidth Out</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${streams.streams.map(stream => `
+                                        <tr>
+                                            <td><strong>${this.escapeHtml(stream.name)}</strong></td>
+                                            <td><code>${this.escapeHtml(stream.app)}</code></td>
+                                            <td><span class="badge bg-primary">${stream.clients}</span></td>
+                                            <td><small>${stream.video.codec || 'N/A'} ${stream.video.width ? stream.video.width + 'x' + stream.video.height : ''}</small></td>
+                                            <td><small>${stream.audio.codec || 'N/A'} ${stream.audio.sample_rate ? stream.audio.sample_rate/1000 + 'kHz' : ''}</small></td>
+                                            <td><span class="text-info">${(stream.bandwidth_in / 1000).toFixed(1)} Mbps</span></td>
+                                            <td><span class="text-success">${(stream.bandwidth_out / 1000).toFixed(1)} Mbps</span></td>
+                                            <td><span class="badge ${stream.publish_active ? 'bg-success' : 'bg-warning'}">${stream.publish_active ? 'Live' : 'Inactive'}</span></td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            ` : `
+                <div class="row mb-4">
+                    <div class="col">
+                        <h6>Active Streams</h6>
+                        <div class="text-center py-3">
+                            <i class="fas fa-stream fa-2x text-muted mb-2"></i>
+                            <p class="text-muted mb-0">No active streams</p>
+                        </div>
+                    </div>
+                </div>
+            `}
+            
             ${metrics.length > 0 ? `
                 <div class="row">
                     <div class="col">
