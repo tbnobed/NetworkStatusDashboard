@@ -8,6 +8,8 @@ class CDNDashboard {
     
     init() {
         this.setupEventListeners();
+        // Load initial data
+        this.refreshDashboard();
         this.startAutoRefresh();
     }
     
