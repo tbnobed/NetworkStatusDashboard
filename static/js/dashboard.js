@@ -372,8 +372,8 @@ class CDNDashboard {
                                             <td><strong>${this.escapeHtml(stream.name)}</strong></td>
                                             <td><code>${this.escapeHtml(stream.app)}</code></td>
                                             <td><span class="badge bg-primary">${stream.clients}</span></td>
-                                            <td><small>${stream.video.codec || 'N/A'} ${stream.video.width ? stream.video.width + 'x' + stream.video.height : ''}</small></td>
-                                            <td><small>${stream.audio.codec || 'N/A'} ${stream.audio.sample_rate ? stream.audio.sample_rate/1000 + 'kHz' : ''}</small></td>
+                                            <td><small>${stream.video ? (stream.video.codec || 'N/A') + ' ' + (stream.video.width ? stream.video.width + 'x' + stream.video.height : '') : 'N/A'}</small></td>
+                                            <td><small>${stream.audio ? (stream.audio.codec || 'N/A') + ' ' + (stream.audio.sample_rate ? stream.audio.sample_rate/1000 + 'kHz' : '') : 'N/A'}</small></td>
                                             <td><span class="text-info">${(stream.bandwidth_in / 1000).toFixed(1)} Mbps</span></td>
                                             <td><span class="text-success">${(stream.bandwidth_out / 1000).toFixed(1)} Mbps</span></td>
                                             <td><span class="badge ${stream.publish_active ? 'bg-success' : 'bg-warning'}">${stream.publish_active ? 'Live' : 'Inactive'}</span></td>
