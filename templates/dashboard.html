@@ -208,33 +208,15 @@
                                         
                                         <div class="row text-center mb-2">
                                             <div class="col-4">
-                                                <div class="metric-value" data-metric="connections">
-                                                    {% if server.metrics.first() %}
-                                                        {{ server.metrics.first().active_connections or 0 }}
-                                                    {% else %}
-                                                        0
-                                                    {% endif %}
-                                                </div>
+                                                <div class="metric-value" data-metric="connections">0</div>
                                                 <div class="metric-label">Connections</div>
                                             </div>
                                             <div class="col-4">
-                                                <div class="metric-value text-warning" data-metric="stream_count">
-                                                    {% if server.metrics.first() %}
-                                                        {{ server.metrics.first().stream_count or 0 }}
-                                                    {% else %}
-                                                        0
-                                                    {% endif %}
-                                                </div>
+                                                <div class="metric-value text-warning" data-metric="stream_count">0</div>
                                                 <div class="metric-label">Streams</div>
                                             </div>
                                             <div class="col-4">
-                                                <div class="metric-value" data-metric="response_time">
-                                                    {% if server.metrics.first() and server.metrics.first().response_time %}
-                                                        {{ "%.0f"|format(server.metrics.first().response_time) }}ms
-                                                    {% else %}
-                                                        N/A
-                                                    {% endif %}
-                                                </div>
+                                                <div class="metric-value" data-metric="response_time">N/A</div>
                                                 <div class="metric-label">Response Time</div>
                                             </div>
                                         </div>
