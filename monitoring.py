@@ -152,6 +152,7 @@ def get_server_metrics(server):
                         if streams_list:
                             logger.debug(f'Found {len(streams_list)} streams for {server.hostname}')
                             active_streams = 0
+                            total_clients = 0
                             
                             for stream in streams_list:
                                 logger.debug(f'Stream data: {stream}')
@@ -159,6 +160,10 @@ def get_server_metrics(server):
                                 # Count active streams
                                 if stream.get('publish', {}).get('active', False):
                                     active_streams += 1
+                                
+                                # Sum up all clients from all streams
+                                clients = stream.get('clients', 0)
+                                total_clients += clients
                                 
                                 # Check for bandwidth data in various formats
                                 if 'kbps' in stream:
@@ -176,8 +181,10 @@ def get_server_metrics(server):
                                     if 'send' in bytes_data:
                                         total_bytes_sent += int(bytes_data['send'])
                             
-                            # Store stream count
+                            # Store stream count and total clients
                             metrics['stream_count'] = active_streams
+                            # Override active_connections with total clients from streams
+                            metrics['active_connections'] = total_clients
                         
                         # Convert kbps to Mbps and store metrics
                         metrics['bandwidth_in'] = total_bandwidth_in / 1000
