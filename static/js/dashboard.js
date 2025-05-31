@@ -255,16 +255,19 @@ class CDNDashboard {
     
     async showServerDetails(serverId) {
         try {
-            const metrics = await this.fetchData(`/api/servers/${serverId}/metrics`);
-            const server = await this.fetchData(`/api/servers`).then(servers => 
-                servers.find(s => s.id == serverId)
-            );
+            const [metrics, streams, server] = await Promise.all([
+                this.fetchData(`/api/servers/${serverId}/metrics`),
+                this.fetchData(`/api/servers/${serverId}/streams`),
+                this.fetchData(`/api/servers`).then(servers => 
+                    servers.find(s => s.id == serverId)
+                )
+            ]);
             
             if (!server) {
                 throw new Error('Server not found');
             }
             
-            this.displayServerModal(server, metrics);
+            this.displayServerModal(server, metrics, streams);
             
         } catch (error) {
             console.error('Error loading server details:', error);
@@ -272,10 +275,10 @@ class CDNDashboard {
         }
     }
     
-    displayServerModal(server, metrics) {
+    displayServerModal(server, metrics, streams) {
         const modalHtml = `
             <div class="modal fade" id="serverModal" tabindex="-1">
-                <div class="modal-dialog modal-lg">
+                <div class="modal-dialog modal-xl">
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title">
@@ -288,7 +291,7 @@ class CDNDashboard {
                             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                         </div>
                         <div class="modal-body">
-                            ${this.generateServerDetailsContent(server, metrics)}
+                            ${this.generateServerDetailsContent(server, metrics, streams)}
                         </div>
                     </div>
                 </div>

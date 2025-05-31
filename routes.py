@@ -4,6 +4,7 @@ from models import Server, ServerMetric, Alert
 from monitoring import test_server_connectivity, get_server_metrics
 from sqlalchemy import desc
 from datetime import datetime, timedelta
+import requests
 
 @app.route('/')
 def dashboard():
@@ -223,6 +224,56 @@ def api_server_metrics(server_id):
     ).order_by(ServerMetric.timestamp.desc()).limit(288).all()  # 5-minute intervals for 24 hours
     
     return jsonify([metric.to_dict() for metric in metrics])
+
+@app.route('/api/servers/<int:server_id>/streams')
+def api_server_streams(server_id):
+    """API endpoint to get current server streams"""
+    server = Server.query.get_or_404(server_id)
+    
+    streams = []
+    
+    try:
+        if server.api_endpoint and server.api_type == 'srs':
+            # Prepare authentication headers
+            headers = {}
+            auth = None
+            
+            if server.api_token:
+                headers['Authorization'] = f'Bearer {server.api_token}'
+            elif server.api_username and server.api_password:
+                auth = (server.api_username, server.api_password)
+            
+            # Get streams from SRS API
+            response = requests.get(f"{server.api_endpoint}/api/v1/streams", 
+                                  headers=headers, auth=auth, timeout=10)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if 'streams' in data:
+                    for stream in data['streams']:
+                        streams.append({
+                            'id': stream.get('id', ''),
+                            'name': stream.get('name', ''),
+                            'app': stream.get('app', ''),
+                            'url': stream.get('url', ''),
+                            'clients': stream.get('clients', 0),
+                            'frames': stream.get('frames', 0),
+                            'bandwidth_in': stream.get('kbps', {}).get('recv_30s', 0),
+                            'bandwidth_out': stream.get('kbps', {}).get('send_30s', 0),
+                            'video': stream.get('video', {}),
+                            'audio': stream.get('audio', {}),
+                            'publish_active': stream.get('publish', {}).get('active', False),
+                            'live_time': stream.get('live_ms', 0)
+                        })
+    except Exception as e:
+        app.logger.error(f'Error fetching streams for server {server.hostname}: {str(e)}')
+    
+    return jsonify({
+        'server': server.to_dict(),
+        'streams': streams,
+        'total_streams': len(streams),
+        'total_clients': sum(s['clients'] for s in streams)
+    })
 
 @app.route('/api/alerts')
 def api_alerts():
