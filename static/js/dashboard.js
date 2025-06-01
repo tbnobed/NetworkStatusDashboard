@@ -166,6 +166,10 @@ class CDNDashboard {
     }
     
     updateServerCard(card, server) {
+        // Update card status class
+        card.className = card.className.replace(/status-\w+/g, '');
+        card.classList.add(`status-${server.status}`);
+        
         // Update status badge
         const statusBadge = card.querySelector('.badge');
         if (statusBadge) {
@@ -213,6 +217,12 @@ class CDNDashboard {
     }
     
     updateServerTableRow(row, server) {
+        // Update row status class for visual styling
+        row.className = row.className.replace(/server-\w+/g, '');
+        if (server.status === 'down') {
+            row.classList.add('server-down');
+        }
+        
         // Update status
         const statusElement = row.querySelector('.server-status');
         if (statusElement) {
