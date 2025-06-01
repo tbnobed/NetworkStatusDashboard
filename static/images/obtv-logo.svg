@@ -1,0 +1,45 @@
+<svg width="200" height="60" viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#3B82F6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1E40AF;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="textGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#1F2937;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#374151;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Logo Icon -->
+  <g transform="translate(10, 8)">
+    <!-- Main circle -->
+    <circle cx="22" cy="22" r="20" fill="url(#logoGradient)" stroke="#FFFFFF" stroke-width="2"/>
+    <!-- Inner elements representing CDN nodes -->
+    <circle cx="22" cy="22" r="3" fill="#FFFFFF" opacity="0.9"/>
+    <circle cx="12" cy="15" r="2" fill="#FFFFFF" opacity="0.7"/>
+    <circle cx="32" cy="15" r="2" fill="#FFFFFF" opacity="0.7"/>
+    <circle cx="12" cy="29" r="2" fill="#FFFFFF" opacity="0.7"/>
+    <circle cx="32" cy="29" r="2" fill="#FFFFFF" opacity="0.7"/>
+    <!-- Connection lines -->
+    <line x1="22" y1="22" x2="12" y2="15" stroke="#FFFFFF" stroke-width="1.5" opacity="0.6"/>
+    <line x1="22" y1="22" x2="32" y2="15" stroke="#FFFFFF" stroke-width="1.5" opacity="0.6"/>
+    <line x1="22" y1="22" x2="12" y2="29" stroke="#FFFFFF" stroke-width="1.5" opacity="0.6"/>
+    <line x1="22" y1="22" x2="32" y2="29" stroke="#FFFFFF" stroke-width="1.5" opacity="0.6"/>
+  </g>
+  
+  <!-- Text -->
+  <g transform="translate(60, 18)">
+    <!-- OBTV -->
+    <text x="0" y="20" font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif" font-size="20" font-weight="700" fill="url(#textGradient)">obtv</text>
+    <!-- CDN -->
+    <text x="0" y="38" font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif" font-size="12" font-weight="500" fill="#6B7280" letter-spacing="2px">CDN</text>
+  </g>
+  
+  <!-- Monitoring indicator -->
+  <g transform="translate(150, 15)">
+    <circle cx="15" cy="15" r="3" fill="#10B981">
+      <animate attributeName="opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite"/>
+    </circle>
+    <text x="22" y="19" font-family="Inter, sans-serif" font-size="8" font-weight="500" fill="#6B7280">LIVE</text>
+  </g>
+</svg>

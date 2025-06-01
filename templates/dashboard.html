@@ -1,15 +1,20 @@
 {% extends "base.html" %}
 
-{% block title %}Dashboard - CDN Monitor{% endblock %}
+{% block title %}Dashboard - obtv CDN Monitor{% endblock %}
 
 {% block content %}
 <div class="dashboard-header fade-in">
     <div class="d-flex justify-content-between align-items-start">
         <div>
-            <h1 class="dashboard-title">
-                <i class="fas fa-tachometer-alt"></i>Dashboard
-            </h1>
-            <p class="dashboard-subtitle">Real-time monitoring of your CDN infrastructure</p>
+            <div class="d-flex align-items-center mb-2">
+                <img src="{{ url_for('static', filename='images/obtv-logo.svg') }}" alt="obtv CDN" style="height: 48px;" class="me-3">
+                <div>
+                    <h1 class="dashboard-title mb-0">
+                        <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                    </h1>
+                </div>
+            </div>
+            <p class="dashboard-subtitle">Real-time monitoring of your obtv CDN infrastructure</p>
         </div>
         <button class="btn btn-outline-primary" onclick="refreshDashboard()">
             <i class="fas fa-sync-alt me-1"></i>Refresh
