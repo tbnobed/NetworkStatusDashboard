@@ -293,12 +293,12 @@
                                 <tr>
                                     <th>Server</th>
                                     <th>Status</th>
-                                    <th>Role</th>
+                                    <th class="d-none d-md-table-cell">Role</th>
                                     <th>Connections</th>
                                     <th>Streams</th>
-                                    <th>Bandwidth In</th>
-                                    <th>Bandwidth Out</th>
-                                    <th>Response Time</th>
+                                    <th class="d-none d-lg-table-cell">Bandwidth In</th>
+                                    <th class="d-none d-lg-table-cell">Bandwidth Out</th>
+                                    <th class="d-none d-sm-table-cell">Response Time</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -318,7 +318,7 @@
                                             {{ server.status.upper() }}
                                         </span>
                                     </td>
-                                    <td>
+                                    <td class="d-none d-md-table-cell">
                                         <span class="server-role server-role-{{ server.role }}">
                                             <i class="fas fa-tag"></i>{{ server.role.title() }}
                                         </span>
@@ -329,7 +329,7 @@
                                     <td>
                                         <span class="server-metric-value server-metric-warning" data-metric="stream_count">0</span>
                                     </td>
-                                    <td>
+                                    <td class="d-none d-lg-table-cell">
                                         <span class="bandwidth-value bandwidth-in" data-metric="bandwidth_in">
                                             {% if server.metrics.first() and server.metrics.first().bandwidth_in %}
                                                 {{ "%.2f"|format(server.metrics.first().bandwidth_in) }}
@@ -339,7 +339,7 @@
                                         </span>
                                         <small class="text-muted"> Mbps</small>
                                     </td>
-                                    <td>
+                                    <td class="d-none d-lg-table-cell">
                                         <span class="bandwidth-value bandwidth-out" data-metric="bandwidth_out">
                                             {% if server.metrics.first() and server.metrics.first().bandwidth_out %}
                                                 {{ "%.2f"|format(server.metrics.first().bandwidth_out) }}
@@ -349,12 +349,13 @@
                                         </span>
                                         <small class="text-muted"> Mbps</small>
                                     </td>
-                                    <td>
+                                    <td class="d-none d-sm-table-cell">
                                         <span class="server-metric-value" data-metric="response_time">N/A</span>
                                     </td>
                                     <td>
                                         <button class="btn btn-sm btn-outline-primary" onclick="dashboard.showServerDetails({{ server.id }})">
                                             <i class="fas fa-chart-line"></i>
+                                            <span class="d-none d-md-inline">Details</span>
                                         </button>
                                     </td>
                                 </tr>
