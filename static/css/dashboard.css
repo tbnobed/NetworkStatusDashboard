@@ -354,6 +354,21 @@ h6 { font-size: 0.875rem; }
 
 .server-card.status-down::before {
   background: linear-gradient(90deg, var(--danger-red), var(--danger-red-light));
+  height: 4px;
+}
+
+.server-card.status-down {
+  border-color: var(--danger-red);
+  background: rgba(220, 38, 38, 0.03);
+  box-shadow: 0 0 0 1px rgba(220, 38, 38, 0.1), var(--shadow-sm);
+}
+
+.server-card.status-down .server-title {
+  color: var(--danger-red);
+}
+
+.server-card.status-down .server-metric-value {
+  color: var(--gray-400);
 }
 
 .server-card.status-warning::before {
@@ -474,8 +489,20 @@ h6 { font-size: 0.875rem; }
 }
 
 .status-badge.status-down {
-  background: rgba(220, 38, 38, 0.1);
+  background: rgba(220, 38, 38, 0.15);
   color: var(--danger-red);
+  border: 1px solid rgba(220, 38, 38, 0.3);
+  font-weight: 700;
+  animation: pulse-red 2s infinite;
+}
+
+@keyframes pulse-red {
+  0%, 100% { 
+    box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.4);
+  }
+  50% { 
+    box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.1);
+  }
 }
 
 .status-badge.status-warning {
@@ -948,6 +975,20 @@ h6 { font-size: 0.875rem; }
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* Table Row Styling for Down Servers */
+.table tbody tr.server-down {
+  background: rgba(220, 38, 38, 0.02);
+  border-left: 4px solid var(--danger-red);
+}
+
+.table tbody tr.server-down:hover {
+  background: rgba(220, 38, 38, 0.05);
+}
+
+.table tbody tr.server-down td {
+  border-bottom-color: rgba(220, 38, 38, 0.1);
 }
 
 /* Server Cards */
