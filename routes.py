@@ -13,7 +13,10 @@ def dashboard():
     user_agent = request.headers.get('User-Agent', '').lower()
     is_mobile = any(device in user_agent for device in [
         'mobile', 'android', 'iphone', 'ipad', 'ipod', 'blackberry', 
-        'windows phone', 'opera mini', 'iemobile', 'fennec'
+        'windows phone', 'opera mini', 'iemobile', 'fennec', 'webos',
+        'palm', 'symbian', 'tablet', 'kindle', 'silk', 'playbook'
+    ]) or any(pattern in user_agent for pattern in [
+        'mobi', 'phone', 'mini', 'nokia', 'samsung', 'htc', 'motorola'
     ])
     
     # Check for mobile parameter override
