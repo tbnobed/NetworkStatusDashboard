@@ -343,7 +343,16 @@ def test_server(server_id):
 def api_servers():
     """API endpoint to get all servers with their latest metrics"""
     servers = Server.query.all()
-    return jsonify([server.to_dict() for server in servers])
+    
+    # Add latest metrics to each server
+    server_data = []
+    for server in servers:
+        server_dict = server.to_dict()
+        latest_metric = server.metrics.order_by(desc(ServerMetric.timestamp)).first()
+        server_dict['latest_metrics'] = latest_metric.to_dict() if latest_metric else None
+        server_data.append(server_dict)
+    
+    return jsonify(server_data)
 
 @app.route('/api/servers/<int:server_id>/metrics')
 def api_server_metrics(server_id):

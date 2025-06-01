@@ -333,8 +333,8 @@ function showMobileServerDetails(serverId) {
 
     // Fetch server details
     Promise.all([
-        fetch(`/api/server/${serverId}/metrics`).then(r => r.json()),
-        fetch(`/api/server/${serverId}/streams`).then(r => r.json()),
+        fetch(`/api/servers/${serverId}/metrics`).then(r => r.json()),
+        fetch(`/api/servers/${serverId}/streams`).then(r => r.json()),
         fetch(`/api/servers`).then(r => r.json())
     ]).then(([metrics, streams, servers]) => {
         const server = servers.find(s => s.id === serverId);
