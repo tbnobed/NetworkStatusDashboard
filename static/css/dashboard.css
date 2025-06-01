@@ -991,6 +991,20 @@ h6 { font-size: 0.875rem; }
   border-bottom-color: rgba(220, 38, 38, 0.1);
 }
 
+/* Table Row Styling for Online Servers */
+.table tbody tr.server-up {
+  background: rgba(5, 150, 105, 0.02);
+  border-left: 4px solid var(--success-green);
+}
+
+.table tbody tr.server-up:hover {
+  background: rgba(5, 150, 105, 0.05);
+}
+
+.table tbody tr.server-up td {
+  border-bottom-color: rgba(5, 150, 105, 0.1);
+}
+
 /* Server Cards */
 .server-card {
     background: var(--white);

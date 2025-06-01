@@ -221,6 +221,8 @@ class CDNDashboard {
         row.className = row.className.replace(/server-\w+/g, '');
         if (server.status === 'down') {
             row.classList.add('server-down');
+        } else if (server.status === 'up') {
+            row.classList.add('server-up');
         }
         
         // Update status
