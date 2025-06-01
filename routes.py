@@ -9,6 +9,20 @@ import requests
 @app.route('/')
 def dashboard():
     """Main dashboard view"""
+    # Check if this is a mobile device
+    user_agent = request.headers.get('User-Agent', '').lower()
+    is_mobile = any(device in user_agent for device in [
+        'mobile', 'android', 'iphone', 'ipad', 'ipod', 'blackberry', 
+        'windows phone', 'opera mini', 'iemobile', 'fennec'
+    ])
+    
+    # Check for mobile parameter override
+    force_mobile = request.args.get('mobile') == '1'
+    force_desktop = request.args.get('desktop') == '1'
+    
+    if (is_mobile or force_mobile) and not force_desktop:
+        return redirect(url_for('mobile_dashboard'))
+    
     servers = Server.query.all()
     recent_alerts = Alert.query.filter_by(acknowledged=False).order_by(desc(Alert.created_at)).limit(10).all()
     
@@ -52,6 +66,55 @@ def dashboard():
     }
     
     return render_template('dashboard.html', servers=servers, alerts=recent_alerts, stats=stats)
+
+@app.route('/mobile')
+def mobile_dashboard():
+    """Mobile-optimized dashboard view"""
+    servers = Server.query.all()
+    recent_alerts = Alert.query.filter_by(acknowledged=False).order_by(desc(Alert.created_at)).limit(5).all()
+    
+    # Calculate summary statistics
+    total_servers = len(servers)
+    online_servers = len([s for s in servers if s.status == 'up'])
+    offline_servers = len([s for s in servers if s.status == 'down'])
+    unknown_servers = len([s for s in servers if s.status == 'unknown'])
+    
+    # Get total connections, bandwidth, and streams across all servers
+    total_connections = 0
+    total_bandwidth_up = 0
+    total_bandwidth_down = 0
+    total_streams = 0
+    
+    for server in servers:
+        latest_metric = server.metrics.order_by(desc(ServerMetric.timestamp)).first()
+        if latest_metric:
+            if latest_metric.active_connections:
+                total_connections += latest_metric.active_connections
+            
+            # Add separate upload/download bandwidth
+            if latest_metric.bandwidth_in:
+                total_bandwidth_down += latest_metric.bandwidth_in
+            if latest_metric.bandwidth_out:
+                total_bandwidth_up += latest_metric.bandwidth_out
+                
+            # Add stream count
+            if latest_metric.stream_count:
+                total_streams += latest_metric.stream_count
+    
+    stats = {
+        'total_servers': total_servers,
+        'status_counts': {
+            'up': online_servers,
+            'down': offline_servers,
+            'unknown': unknown_servers
+        },
+        'total_connections': total_connections,
+        'total_bandwidth_up': total_bandwidth_up,
+        'total_bandwidth_down': total_bandwidth_down,
+        'total_streams': total_streams
+    }
+    
+    return render_template('mobile_dashboard.html', servers=servers, alerts=recent_alerts, stats=stats)
 
 @app.route('/servers')
 def servers():

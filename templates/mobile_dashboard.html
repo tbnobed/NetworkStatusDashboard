@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OBTV CDN Monitor - Mobile</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Mobile-specific CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile-dashboard.css') }}">
+</head>
+<body>
+    <!-- Mobile Header -->
+    <header class="mobile-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <div class="header-brand">
+                <img src="{{ url_for('static', filename='images/obtv-logo-compact.svg') }}" alt="OBTV CDN" class="logo">
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-refresh" onclick="refreshMobileDashboard()">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+                <a href="{{ url_for('dashboard') }}" class="btn btn-desktop">
+                    <i class="fas fa-desktop"></i>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Status Overview -->
+    <section class="status-overview">
+        <div class="container-fluid">
+            <div class="overview-grid">
+                <div class="status-card">
+                    <div class="status-icon">
+                        <i class="fas fa-server"></i>
+                    </div>
+                    <div class="status-info">
+                        <div class="status-value" id="mobile-total-servers">{{ stats.total_servers }}</div>
+                        <div class="status-label">Servers</div>
+                    </div>
+                </div>
+                
+                <div class="status-card">
+                    <div class="status-icon online">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="status-info">
+                        <div class="status-value" id="mobile-online-servers">{{ stats.status_counts.up or 0 }}</div>
+                        <div class="status-label">Online</div>
+                    </div>
+                </div>
+                
+                <div class="status-card">
+                    <div class="status-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="status-info">
+                        <div class="status-value" id="mobile-total-connections">{{ stats.total_connections }}</div>
+                        <div class="status-label">Connections</div>
+                    </div>
+                </div>
+                
+                <div class="status-card">
+                    <div class="status-icon">
+                        <i class="fas fa-play-circle"></i>
+                    </div>
+                    <div class="status-info">
+                        <div class="status-value" id="mobile-total-streams">{{ stats.total_streams or 0 }}</div>
+                        <div class="status-label">Streams</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Bandwidth Summary -->
+    <section class="bandwidth-summary">
+        <div class="container-fluid">
+            <h5 class="section-title">
+                <i class="fas fa-tachometer-alt"></i>
+                Bandwidth Usage
+            </h5>
+            <div class="bandwidth-cards">
+                <div class="bandwidth-card">
+                    <div class="bandwidth-direction">
+                        <i class="fas fa-arrow-down text-success"></i>
+                        <span>Incoming</span>
+                    </div>
+                    <div class="bandwidth-value" id="mobile-bandwidth-down">
+                        {{ "%.1f"|format(stats.total_bandwidth_down or 0) }} Mbps
+                    </div>
+                </div>
+                
+                <div class="bandwidth-card">
+                    <div class="bandwidth-direction">
+                        <i class="fas fa-arrow-up text-primary"></i>
+                        <span>Outgoing</span>
+                    </div>
+                    <div class="bandwidth-value" id="mobile-bandwidth-up">
+                        {{ "%.1f"|format(stats.total_bandwidth_up or 0) }} Mbps
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Server List -->
+    <section class="server-list">
+        <div class="container-fluid">
+            <h5 class="section-title">
+                <i class="fas fa-server"></i>
+                Servers
+            </h5>
+            
+            <div class="mobile-servers" id="mobile-servers-list">
+                {% for server in servers %}
+                <div class="mobile-server-card" data-server-id="{{ server.id }}">
+                    <div class="server-header">
+                        <div class="server-name">{{ server.hostname }}</div>
+                        <div class="server-status status-{{ server.status }}">
+                            <i class="fas fa-{{ 'check-circle' if server.status == 'up' else 'times-circle' if server.status == 'down' else 'question-circle' }}"></i>
+                            {{ server.status.upper() }}
+                        </div>
+                    </div>
+                    
+                    <div class="server-details">
+                        <div class="server-info">
+                            <span class="server-role role-{{ server.role }}">{{ server.role.title() }}</span>
+                            <span class="server-address">{{ server.ip_address }}:{{ server.port }}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="server-metrics">
+                        <div class="metric-row">
+                            <div class="metric-item">
+                                <div class="metric-value" data-metric="connections">0</div>
+                                <div class="metric-label">Connections</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value" data-metric="stream_count">0</div>
+                                <div class="metric-label">Streams</div>
+                            </div>
+                        </div>
+                        
+                        <div class="metric-row">
+                            <div class="metric-item">
+                                <div class="metric-value">
+                                    <span data-metric="bandwidth_in">0.00</span> Mbps
+                                </div>
+                                <div class="metric-label">In</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">
+                                    <span data-metric="bandwidth_out">0.00</span> Mbps
+                                </div>
+                                <div class="metric-label">Out</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="server-actions">
+                        <button class="btn btn-details" onclick="showMobileServerDetails({{ server.id }})">
+                            <i class="fas fa-info-circle"></i>
+                            Details
+                        </button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <!-- Alerts -->
+    {% if alerts %}
+    <section class="alerts-section">
+        <div class="container-fluid">
+            <h5 class="section-title">
+                <i class="fas fa-exclamation-triangle"></i>
+                Recent Alerts
+            </h5>
+            
+            <div class="mobile-alerts" id="mobile-alerts-list">
+                {% for alert in alerts %}
+                <div class="mobile-alert alert-{{ alert.severity }}">
+                    <div class="alert-icon">
+                        <i class="fas fa-{{ 'exclamation-circle' if alert.severity == 'warning' else 'times-circle' if alert.severity == 'error' else 'info-circle' }}"></i>
+                    </div>
+                    <div class="alert-content">
+                        <div class="alert-message">{{ alert.message }}</div>
+                        <div class="alert-time">{{ alert.created_at.strftime('%H:%M') }}</div>
+                    </div>
+                    {% if not alert.acknowledged %}
+                    <button class="alert-dismiss" onclick="acknowledgeMobileAlert({{ alert.id }})">
+                        <i class="fas fa-check"></i>
+                    </button>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <div class="nav-items">
+            <a href="#" class="nav-item active" onclick="scrollToSection('status-overview')">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>Overview</span>
+            </a>
+            <a href="#" class="nav-item" onclick="scrollToSection('server-list')">
+                <i class="fas fa-server"></i>
+                <span>Servers</span>
+            </a>
+            <a href="{{ url_for('servers') }}" class="nav-item">
+                <i class="fas fa-cog"></i>
+                <span>Manage</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Mobile Server Details Modal -->
+    <div class="mobile-modal" id="mobile-server-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title" id="mobile-modal-title">Server Details</h6>
+                <button class="modal-close" onclick="closeMobileModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="mobile-modal-body">
+                <!-- Server details will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Mobile Dashboard JS -->
+    <script src="{{ url_for('static', filename='js/mobile-dashboard.js') }}"></script>
+    
+    <script>
+        // Initialize mobile dashboard
+        const mobileDashboard = new MobileDashboard();
+        mobileDashboard.init();
+    </script>
+</body>
+</html>
