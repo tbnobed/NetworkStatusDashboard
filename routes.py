@@ -9,6 +9,10 @@ import requests
 @app.route('/')
 def dashboard():
     """Main dashboard view"""
+    # Check for mobile parameter override first
+    force_mobile = request.args.get('mobile') == '1'
+    force_desktop = request.args.get('desktop') == '1'
+    
     # Check if this is a mobile device
     user_agent = request.headers.get('User-Agent', '').lower()
     is_mobile = any(device in user_agent for device in [
@@ -19,11 +23,13 @@ def dashboard():
         'mobi', 'phone', 'mini', 'nokia', 'samsung', 'htc', 'motorola'
     ])
     
-    # Check for mobile parameter override
-    force_mobile = request.args.get('mobile') == '1'
-    force_desktop = request.args.get('desktop') == '1'
+    # Debug logging
+    app.logger.info(f"User-Agent: {request.headers.get('User-Agent', 'None')}")
+    app.logger.info(f"Is mobile detected: {is_mobile}")
+    app.logger.info(f"Force mobile: {force_mobile}, Force desktop: {force_desktop}")
     
     if (is_mobile or force_mobile) and not force_desktop:
+        app.logger.info("Redirecting to mobile dashboard")
         return redirect(url_for('mobile_dashboard'))
     
     servers = Server.query.all()
