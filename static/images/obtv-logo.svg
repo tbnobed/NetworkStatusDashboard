@@ -30,7 +30,7 @@
   <!-- Text -->
   <g transform="translate(60, 18)">
     <!-- OBTV -->
-    <text x="0" y="20" font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif" font-size="20" font-weight="700" fill="url(#textGradient)">obtv</text>
+    <text x="0" y="20" font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif" font-size="20" font-weight="700" fill="url(#textGradient)">OBTV</text>
     <!-- CDN -->
     <text x="0" y="38" font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif" font-size="12" font-weight="500" fill="#6B7280" letter-spacing="2px">CDN</text>
   </g>
