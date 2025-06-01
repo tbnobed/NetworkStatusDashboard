@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" width="192" height="192">
+  <defs>
+    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#007bff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0056b3;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background circle -->
+  <circle cx="96" cy="96" r="90" fill="url(#grad1)" stroke="#ffffff" stroke-width="4"/>
+  
+  <!-- Network nodes -->
+  <circle cx="48" cy="48" r="12" fill="#ffffff"/>
+  <circle cx="144" cy="48" r="12" fill="#ffffff"/>
+  <circle cx="96" cy="96" r="18" fill="#ffffff"/>
+  <circle cx="48" cy="144" r="12" fill="#ffffff"/>
+  <circle cx="144" cy="144" r="12" fill="#ffffff"/>
+  
+  <!-- Connection lines -->
+  <line x1="48" y1="48" x2="96" y2="96" stroke="#ffffff" stroke-width="8" opacity="0.8"/>
+  <line x1="144" y1="48" x2="96" y2="96" stroke="#ffffff" stroke-width="8" opacity="0.8"/>
+  <line x1="96" y1="96" x2="48" y2="144" stroke="#ffffff" stroke-width="8" opacity="0.8"/>
+  <line x1="96" y1="96" x2="144" y2="144" stroke="#ffffff" stroke-width="8" opacity="0.8"/>
+  
+  <!-- OBTV text -->
+  <text x="96" y="130" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#ffffff">OBTV</text>
+  <text x="96" y="148" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">CDN</text>
+</svg>
