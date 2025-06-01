@@ -187,59 +187,89 @@
                 {% if servers %}
                     <div class="row" id="servers-grid">
                         {% for server in servers %}
-                            <div class="col-md-6 col-lg-4 mb-3">
-                                <div class="card server-card" data-server-id="{{ server.id }}">
-                                    <div class="card-body">
-                                        <div class="d-flex justify-content-between align-items-start mb-2">
-                                            <h6 class="card-title mb-1">{{ server.hostname }}</h6>
-                                            <span class="badge bg-{{ 'success' if server.status == 'up' else 'danger' if server.status == 'down' else 'secondary' }}">
+                            <div class="col-md-6 col-lg-4 mb-4">
+                                <div class="server-card slide-up" data-server-id="{{ server.id }}">
+                                    <div class="server-header">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div>
+                                                <h6 class="server-title">{{ server.hostname }}</h6>
+                                                <div class="server-meta">
+                                                    <span class="server-role server-role-{{ server.role }}">
+                                                        <i class="fas fa-tag"></i>{{ server.role.title() }}
+                                                    </span>
+                                                </div>
+                                                <div class="server-address">
+                                                    <i class="fas fa-network-wired"></i>{{ server.ip_address }}:{{ server.port }}
+                                                </div>
+                                            </div>
+                                            <div class="server-status status-{{ server.status }}">
+                                                <i class="fas fa-{{ 'check-circle' if server.status == 'up' else 'times-circle' if server.status == 'down' else 'question-circle' }}"></i>
                                                 {{ server.status.upper() }}
-                                            </span>
-                                        </div>
-                                        
-                                        <p class="text-muted small mb-2">
-                                            <i class="fas fa-tag me-1"></i>{{ server.role.title() }}
-                                            <br>
-                                            <i class="fas fa-network-wired me-1"></i>{{ server.ip_address }}:{{ server.port }}
-                                        </p>
-                                        
-                                        <div class="row text-center mb-2">
-                                            <div class="col-4">
-                                                <div class="metric-value" data-metric="connections">0</div>
-                                                <div class="metric-label">Connections</div>
-                                            </div>
-                                            <div class="col-4">
-                                                <div class="metric-value text-warning" data-metric="stream_count">0</div>
-                                                <div class="metric-label">Streams</div>
-                                            </div>
-                                            <div class="col-4">
-                                                <div class="metric-value" data-metric="response_time">N/A</div>
-                                                <div class="metric-label">Response Time</div>
                                             </div>
                                         </div>
-                                        
-                                        <div class="row text-center">
-                                            <div class="col-6">
-                                                <div class="metric-value text-success" data-metric="bandwidth_in">
-                                                    {% if server.metrics.first() and server.metrics.first().bandwidth_in %}
-                                                        {{ "%.2f"|format(server.metrics.first().bandwidth_in) }}
-                                                    {% else %}
-                                                        0.00
-                                                    {% endif %}
+                                    </div>
+                                    
+                                    <div class="server-metrics">
+                                        <div class="row">
+                                            <div class="col-4">
+                                                <div class="server-metric">
+                                                    <div class="server-metric-value" data-metric="connections">0</div>
+                                                    <div class="server-metric-label">Connections</div>
                                                 </div>
-                                                <div class="metric-label">↓ Mbps</div>
                                             </div>
-                                            <div class="col-6">
-                                                <div class="metric-value text-primary" data-metric="bandwidth_out">
-                                                    {% if server.metrics.first() and server.metrics.first().bandwidth_out %}
-                                                        {{ "%.2f"|format(server.metrics.first().bandwidth_out) }}
-                                                    {% else %}
-                                                        0.00
-                                                    {% endif %}
+                                            <div class="col-4">
+                                                <div class="server-metric">
+                                                    <div class="server-metric-value server-metric-warning" data-metric="stream_count">0</div>
+                                                    <div class="server-metric-label">Streams</div>
                                                 </div>
-                                                <div class="metric-label">↑ Mbps</div>
+                                            </div>
+                                            <div class="col-4">
+                                                <div class="server-metric">
+                                                    <div class="server-metric-value" data-metric="response_time">N/A</div>
+                                                    <div class="server-metric-label">Response Time</div>
+                                                </div>
                                             </div>
                                         </div>
+                                        
+                                        <div class="server-bandwidth">
+                                            <div class="row">
+                                                <div class="col-6">
+                                                    <div class="bandwidth-metric bandwidth-in">
+                                                        <div class="bandwidth-value" data-metric="bandwidth_in">
+                                                            {% if server.metrics.first() and server.metrics.first().bandwidth_in %}
+                                                                {{ "%.2f"|format(server.metrics.first().bandwidth_in) }}
+                                                            {% else %}
+                                                                0.00
+                                                            {% endif %}
+                                                        </div>
+                                                        <div class="bandwidth-label">
+                                                            <i class="fas fa-arrow-down"></i>Mbps
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-6">
+                                                    <div class="bandwidth-metric bandwidth-out">
+                                                        <div class="bandwidth-value" data-metric="bandwidth_out">
+                                                            {% if server.metrics.first() and server.metrics.first().bandwidth_out %}
+                                                                {{ "%.2f"|format(server.metrics.first().bandwidth_out) }}
+                                                            {% else %}
+                                                                0.00
+                                                            {% endif %}
+                                                        </div>
+                                                        <div class="bandwidth-label">
+                                                            <i class="fas fa-arrow-up"></i>Mbps
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="server-actions">
+                                        <button class="btn-action" onclick="showServerDetails({{ server.id }})">
+                                            <i class="fas fa-chart-line"></i>
+                                            View Details
+                                        </button>
                                     </div>
                                 </div>
                             </div>
