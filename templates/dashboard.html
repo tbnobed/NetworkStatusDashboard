@@ -3,14 +3,14 @@
 {% block title %}Dashboard - CDN Monitor{% endblock %}
 
 {% block content %}
-<div class="row mb-4">
-    <div class="col">
-        <h1 class="h2">
-            <i class="fas fa-tachometer-alt me-2"></i>Dashboard
-        </h1>
-        <p class="text-muted">Real-time monitoring of your CDN infrastructure</p>
-    </div>
-    <div class="col-auto">
+<div class="dashboard-header fade-in">
+    <div class="d-flex justify-content-between align-items-start">
+        <div>
+            <h1 class="dashboard-title">
+                <i class="fas fa-tachometer-alt"></i>Dashboard
+            </h1>
+            <p class="dashboard-subtitle">Real-time monitoring of your CDN infrastructure</p>
+        </div>
         <button class="btn btn-outline-primary" onclick="refreshDashboard()">
             <i class="fas fa-sync-alt me-1"></i>Refresh
         </button>
@@ -18,67 +18,64 @@
 </div>
 
 <!-- Summary Cards - Row 1 -->
-<div class="row mb-3">
-    <div class="col-md-3">
-        <div class="card bg-primary text-white">
-            <div class="card-body">
-                <div class="d-flex justify-content-between">
-                    <div>
-                        <h6 class="card-title">Total Servers</h6>
-                        <h3 class="mb-0" id="total-servers">{{ stats.total_servers }}</h3>
-                    </div>
-                    <div class="align-self-center">
-                        <i class="fas fa-server fa-2x opacity-50"></i>
-                    </div>
+<div class="row mb-4">
+    <div class="col-md-3 mb-3">
+        <div class="metric-card metric-primary slide-up">
+            <div class="metric-header">
+                <h6 class="metric-title">Total Servers</h6>
+                <div class="metric-icon icon-primary">
+                    <i class="fas fa-server"></i>
                 </div>
+            </div>
+            <div class="metric-value" id="total-servers">{{ stats.total_servers }}</div>
+            <div class="metric-change neutral">
+                <i class="fas fa-minus"></i>
+                Infrastructure
             </div>
         </div>
     </div>
-    
-    <div class="col-md-3">
-        <div class="card bg-success text-white">
-            <div class="card-body">
-                <div class="d-flex justify-content-between">
-                    <div>
-                        <h6 class="card-title">Online</h6>
-                        <h3 class="mb-0" id="online-servers">{{ stats.online_servers }}</h3>
-                    </div>
-                    <div class="align-self-center">
-                        <i class="fas fa-check-circle fa-2x opacity-50"></i>
-                    </div>
+    <div class="col-md-3 mb-3">
+        <div class="metric-card metric-success slide-up">
+            <div class="metric-header">
+                <h6 class="metric-title">Online</h6>
+                <div class="metric-icon icon-success">
+                    <i class="fas fa-check-circle"></i>
                 </div>
+            </div>
+            <div class="metric-value" id="online-servers">{{ stats.online_servers }}</div>
+            <div class="metric-change positive">
+                <i class="fas fa-arrow-up"></i>
+                Healthy
             </div>
         </div>
     </div>
-    
-    <div class="col-md-3">
-        <div class="card bg-danger text-white">
-            <div class="card-body">
-                <div class="d-flex justify-content-between">
-                    <div>
-                        <h6 class="card-title">Offline</h6>
-                        <h3 class="mb-0" id="offline-servers">{{ stats.offline_servers }}</h3>
-                    </div>
-                    <div class="align-self-center">
-                        <i class="fas fa-times-circle fa-2x opacity-50"></i>
-                    </div>
+    <div class="col-md-3 mb-3">
+        <div class="metric-card metric-danger slide-up">
+            <div class="metric-header">
+                <h6 class="metric-title">Offline</h6>
+                <div class="metric-icon icon-danger">
+                    <i class="fas fa-times-circle"></i>
                 </div>
+            </div>
+            <div class="metric-value" id="offline-servers">{{ stats.offline_servers }}</div>
+            <div class="metric-change neutral">
+                <i class="fas fa-minus"></i>
+                No issues
             </div>
         </div>
     </div>
-    
-    <div class="col-md-3">
-        <div class="card bg-info text-white">
-            <div class="card-body">
-                <div class="d-flex justify-content-between">
-                    <div>
-                        <h6 class="card-title">Total Connections</h6>
-                        <h3 class="mb-0" id="total-connections">{{ stats.total_connections }}</h3>
-                    </div>
-                    <div class="align-self-center">
-                        <i class="fas fa-users fa-2x opacity-50"></i>
-                    </div>
+    <div class="col-md-3 mb-3">
+        <div class="metric-card metric-info slide-up">
+            <div class="metric-header">
+                <h6 class="metric-title">Total Connections</h6>
+                <div class="metric-icon icon-info">
+                    <i class="fas fa-users"></i>
                 </div>
+            </div>
+            <div class="metric-value" id="total-connections">{{ stats.total_connections }}</div>
+            <div class="metric-change positive">
+                <i class="fas fa-arrow-up"></i>
+                Active
             </div>
         </div>
     </div>
