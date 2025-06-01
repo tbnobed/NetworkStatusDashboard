@@ -179,9 +179,19 @@
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h5 class="card-title mb-0">Server Overview</h5>
-                <a href="{{ url_for('servers') }}" class="btn btn-outline-primary btn-sm">
-                    <i class="fas fa-cog me-1"></i>Manage Servers
-                </a>
+                <div class="d-flex gap-2">
+                    <div class="btn-group" role="group" aria-label="View options">
+                        <button type="button" class="btn btn-outline-primary btn-sm active" id="card-view-btn" onclick="dashboard.switchView('cards')">
+                            <i class="fas fa-th-large me-1"></i>Cards
+                        </button>
+                        <button type="button" class="btn btn-outline-primary btn-sm" id="table-view-btn" onclick="dashboard.switchView('table')">
+                            <i class="fas fa-list me-1"></i>Table
+                        </button>
+                    </div>
+                    <a href="{{ url_for('servers') }}" class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-cog me-1"></i>Manage Servers
+                    </a>
+                </div>
             </div>
             <div class="card-body">
                 {% if servers %}
@@ -266,7 +276,7 @@
                                     </div>
                                     
                                     <div class="server-actions">
-                                        <button class="btn-action" onclick="showServerDetails({{ server.id }})">
+                                        <button class="btn-action" onclick="dashboard.showServerDetails({{ server.id }})">
                                             <i class="fas fa-chart-line"></i>
                                             View Details
                                         </button>
@@ -274,6 +284,83 @@
                                 </div>
                             </div>
                         {% endfor %}
+                    </div>
+                    
+                    <!-- Table View -->
+                    <div class="table-responsive d-none" id="servers-table">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Server</th>
+                                    <th>Status</th>
+                                    <th>Role</th>
+                                    <th>Connections</th>
+                                    <th>Streams</th>
+                                    <th>Bandwidth In</th>
+                                    <th>Bandwidth Out</th>
+                                    <th>Response Time</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for server in servers %}
+                                <tr data-server-id="{{ server.id }}">
+                                    <td>
+                                        <div>
+                                            <strong>{{ server.hostname }}</strong>
+                                            <br>
+                                            <small class="text-muted">{{ server.ip_address }}:{{ server.port }}</small>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="server-status status-{{ server.status }}">
+                                            <i class="fas fa-{{ 'check-circle' if server.status == 'up' else 'times-circle' if server.status == 'down' else 'question-circle' }}"></i>
+                                            {{ server.status.upper() }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="server-role server-role-{{ server.role }}">
+                                            <i class="fas fa-tag"></i>{{ server.role.title() }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="server-metric-value" data-metric="connections">0</span>
+                                    </td>
+                                    <td>
+                                        <span class="server-metric-value server-metric-warning" data-metric="stream_count">0</span>
+                                    </td>
+                                    <td>
+                                        <span class="bandwidth-value bandwidth-in" data-metric="bandwidth_in">
+                                            {% if server.metrics.first() and server.metrics.first().bandwidth_in %}
+                                                {{ "%.2f"|format(server.metrics.first().bandwidth_in) }}
+                                            {% else %}
+                                                0.00
+                                            {% endif %}
+                                        </span>
+                                        <small class="text-muted"> Mbps</small>
+                                    </td>
+                                    <td>
+                                        <span class="bandwidth-value bandwidth-out" data-metric="bandwidth_out">
+                                            {% if server.metrics.first() and server.metrics.first().bandwidth_out %}
+                                                {{ "%.2f"|format(server.metrics.first().bandwidth_out) }}
+                                            {% else %}
+                                                0.00
+                                            {% endif %}
+                                        </span>
+                                        <small class="text-muted"> Mbps</small>
+                                    </td>
+                                    <td>
+                                        <span class="server-metric-value" data-metric="response_time">N/A</span>
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary" onclick="dashboard.showServerDetails({{ server.id }})">
+                                            <i class="fas fa-chart-line"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
                     </div>
                 {% else %}
                     <div class="text-center py-5">
