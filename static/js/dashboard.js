@@ -676,6 +676,27 @@ class CDNDashboard {
             toastElement.remove();
         });
     }
+    
+    switchView(viewType) {
+        const cardView = document.getElementById('servers-grid');
+        const tableView = document.getElementById('servers-table');
+        const cardBtn = document.getElementById('card-view-btn');
+        const tableBtn = document.getElementById('table-view-btn');
+        
+        if (viewType === 'table') {
+            // Show table view
+            if (cardView) cardView.classList.add('d-none');
+            if (tableView) tableView.classList.remove('d-none');
+            if (cardBtn) cardBtn.classList.remove('active');
+            if (tableBtn) tableBtn.classList.add('active');
+        } else {
+            // Show card view (default)
+            if (tableView) tableView.classList.add('d-none');
+            if (cardView) cardView.classList.remove('d-none');
+            if (tableBtn) tableBtn.classList.remove('active');
+            if (cardBtn) cardBtn.classList.add('active');
+        }
+    }
 }
 
 // Global functions for backward compatibility
