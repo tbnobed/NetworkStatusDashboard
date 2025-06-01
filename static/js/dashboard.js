@@ -55,18 +55,44 @@ class CDNDashboard {
             // Show loading state
             this.showLoading(true);
             
-            // Fetch updated data
+            // Fetch updated data with individual error handling
+            const statsPromise = this.fetchData('/api/dashboard/stats').catch(err => {
+                console.error('Error fetching stats:', err);
+                return null;
+            });
+            
+            const serversPromise = this.fetchData('/api/servers').catch(err => {
+                console.error('Error refreshing servers:', err);
+                return null;
+            });
+            
+            const alertsPromise = this.fetchData('/api/alerts').catch(err => {
+                console.error('Error fetching alerts:', err);
+                return null;
+            });
+            
             const [statsData, serversData, alertsData] = await Promise.all([
-                this.fetchData('/api/dashboard/stats'),
-                this.fetchData('/api/servers'),
-                this.fetchData('/api/alerts')
+                statsPromise,
+                serversPromise, 
+                alertsPromise
             ]);
             
-            // Update dashboard components
-            this.updateStats(statsData);
-            this.updateServerGrid(serversData);
-            this.updateAlerts(alertsData);
-            this.updateCharts(statsData, serversData);
+            // Update dashboard components only if data is available
+            if (statsData) {
+                this.updateStats(statsData);
+            }
+            
+            if (serversData) {
+                this.updateServerGrid(serversData);
+            }
+            
+            if (alertsData) {
+                this.updateAlerts(alertsData);
+            }
+            
+            if (statsData && serversData) {
+                this.updateCharts(statsData, serversData);
+            }
             
         } catch (error) {
             console.error('Error refreshing dashboard:', error);
