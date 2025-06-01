@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Server Management - OBTV CDN Mobile</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Mobile-specific CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile-dashboard.css') }}">
+</head>
+<body>
+    <!-- Mobile Header -->
+    <header class="mobile-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <div class="header-brand">
+                <a href="{{ url_for('mobile_dashboard') }}" class="text-white text-decoration-none">
+                    <i class="fas fa-arrow-left me-2"></i>
+                    <img src="{{ url_for('static', filename='images/obtv-logo-compact.svg') }}" alt="OBTV CDN" class="logo">
+                </a>
+            </div>
+            <div class="header-actions">
+                <a href="{{ url_for('servers') }}" class="btn btn-desktop">
+                    <i class="fas fa-desktop"></i>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Page Title -->
+    <section class="page-title">
+        <div class="container-fluid">
+            <h4 class="section-title">
+                <i class="fas fa-server"></i>
+                Server Management
+            </h4>
+        </div>
+    </section>
+
+    <!-- Add Server Section -->
+    <section class="add-server-section">
+        <div class="container-fluid">
+            <div class="mobile-card">
+                <div class="card-header">
+                    <h6 class="card-title">
+                        <i class="fas fa-plus-circle"></i>
+                        Add New Server
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <a href="{{ url_for('add_server') }}" class="btn btn-primary btn-block">
+                        <i class="fas fa-plus me-2"></i>
+                        Add Server
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Server List -->
+    <section class="server-list">
+        <div class="container-fluid">
+            <h5 class="section-title">
+                <i class="fas fa-list"></i>
+                Servers ({{ servers|length }})
+            </h5>
+            
+            <div class="mobile-servers-management" id="mobile-servers-management">
+                {% for server in servers %}
+                <div class="mobile-server-management-card" data-server-id="{{ server.id }}">
+                    <div class="server-header">
+                        <div class="server-info">
+                            <div class="server-name">{{ server.hostname }}</div>
+                            <div class="server-address">{{ server.ip_address }}:{{ server.port }}</div>
+                        </div>
+                        <div class="server-status status-{{ server.status }}">
+                            <i class="fas fa-{{ 'check-circle' if server.status == 'up' else 'times-circle' if server.status == 'down' else 'question-circle' }}"></i>
+                            {{ server.status.upper() }}
+                        </div>
+                    </div>
+                    
+                    <div class="server-details">
+                        <div class="detail-row">
+                            <span class="detail-label">Role:</span>
+                            <span class="server-role role-{{ server.role }}">{{ server.role.title() }}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">API Type:</span>
+                            <span class="detail-value">{{ server.api_type.upper() if server.api_type else 'N/A' }}</span>
+                        </div>
+                        {% if server.latest_metric %}
+                        <div class="detail-row">
+                            <span class="detail-label">Last Seen:</span>
+                            <span class="detail-value">{{ server.latest_metric.timestamp.strftime('%H:%M') }}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="server-metrics-summary">
+                        <div class="metric-grid">
+                            <div class="metric-item">
+                                <div class="metric-value">{{ server.latest_metric.active_connections if server.latest_metric else 0 }}</div>
+                                <div class="metric-label">Connections</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">{{ server.latest_metric.stream_count if server.latest_metric else 0 }}</div>
+                                <div class="metric-label">Streams</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">{{ "%.1f"|format(server.latest_metric.bandwidth_in) if server.latest_metric and server.latest_metric.bandwidth_in else "0.0" }}</div>
+                                <div class="metric-label">In (Mbps)</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value">{{ "%.1f"|format(server.latest_metric.bandwidth_out) if server.latest_metric and server.latest_metric.bandwidth_out else "0.0" }}</div>
+                                <div class="metric-label">Out (Mbps)</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="server-actions">
+                        <div class="action-grid">
+                            <button class="btn btn-test" onclick="testMobileServer({{ server.id }})">
+                                <i class="fas fa-sync"></i>
+                                Test
+                            </button>
+                            <a href="{{ url_for('edit_server', server_id=server.id) }}" class="btn btn-edit">
+                                <i class="fas fa-edit"></i>
+                                Edit
+                            </a>
+                            <button class="btn btn-details" onclick="showMobileServerDetails({{ server.id }})">
+                                <i class="fas fa-chart-line"></i>
+                                Details
+                            </button>
+                            <button class="btn btn-delete" onclick="confirmDeleteServer({{ server.id }}, '{{ server.hostname }}')">
+                                <i class="fas fa-trash"></i>
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+                
+                {% if not servers %}
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <i class="fas fa-server"></i>
+                    </div>
+                    <div class="empty-message">No servers configured</div>
+                    <div class="empty-description">Add your first server to start monitoring</div>
+                    <a href="{{ url_for('add_server') }}" class="btn btn-primary mt-3">
+                        <i class="fas fa-plus me-2"></i>
+                        Add Server
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <div class="nav-items">
+            <a href="{{ url_for('mobile_dashboard') }}" class="nav-item">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="#" class="nav-item active">
+                <i class="fas fa-server"></i>
+                <span>Servers</span>
+            </a>
+            <a href="{{ url_for('add_server') }}" class="nav-item">
+                <i class="fas fa-plus"></i>
+                <span>Add</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Mobile Confirmation Modal -->
+    <div class="mobile-modal" id="mobile-confirm-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title">Confirm Action</h6>
+                <button class="modal-close" onclick="closeMobileModal('mobile-confirm-modal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="mobile-confirm-body">
+                <!-- Confirmation content will be loaded here -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-cancel" onclick="closeMobileModal('mobile-confirm-modal')">Cancel</button>
+                <button class="btn btn-danger" id="mobile-confirm-action">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Server Details Modal -->
+    <div class="mobile-modal" id="mobile-server-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title" id="mobile-modal-title">Server Details</h6>
+                <button class="modal-close" onclick="closeMobileModal('mobile-server-modal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="mobile-modal-body">
+                <!-- Server details will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Mobile Servers JS -->
+    <script>
+        function testMobileServer(serverId) {
+            const btn = event.target.closest('.btn-test');
+            const originalContent = btn.innerHTML;
+            
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Testing...';
+            btn.disabled = true;
+            
+            fetch(`/servers/${serverId}/test`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showToast('Server test completed successfully', 'success');
+                    // Update server status if returned
+                    if (data.status) {
+                        const statusElement = btn.closest('.mobile-server-management-card').querySelector('.server-status');
+                        statusElement.className = `server-status status-${data.status}`;
+                        statusElement.innerHTML = `<i class="fas fa-${data.status === 'up' ? 'check-circle' : 'times-circle'}"></i> ${data.status.toUpperCase()}`;
+                    }
+                } else {
+                    showToast(data.message || 'Server test failed', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error testing server:', error);
+                showToast('Error testing server', 'error');
+            })
+            .finally(() => {
+                btn.innerHTML = originalContent;
+                btn.disabled = false;
+            });
+        }
+        
+        function confirmDeleteServer(serverId, serverName) {
+            const modal = document.getElementById('mobile-confirm-modal');
+            const body = document.getElementById('mobile-confirm-body');
+            const actionBtn = document.getElementById('mobile-confirm-action');
+            
+            body.innerHTML = `
+                <p>Are you sure you want to delete the server <strong>${serverName}</strong>?</p>
+                <p class="text-danger"><small>This action cannot be undone.</small></p>
+            `;
+            
+            actionBtn.onclick = () => deleteServer(serverId);
+            modal.classList.add('show');
+        }
+        
+        function deleteServer(serverId) {
+            fetch(`/servers/${serverId}/delete`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showToast('Server deleted successfully', 'success');
+                    // Remove server card from DOM
+                    const serverCard = document.querySelector(`[data-server-id="${serverId}"]`);
+                    if (serverCard) {
+                        serverCard.remove();
+                    }
+                    closeMobileModal('mobile-confirm-modal');
+                } else {
+                    showToast(data.message || 'Failed to delete server', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error deleting server:', error);
+                showToast('Error deleting server', 'error');
+            });
+        }
+        
+        function showMobileServerDetails(serverId) {
+            const modal = document.getElementById('mobile-server-modal');
+            const modalTitle = document.getElementById('mobile-modal-title');
+            const modalBody = document.getElementById('mobile-modal-body');
+
+            modalTitle.textContent = 'Loading...';
+            modalBody.innerHTML = '<div class="text-center p-4"><i class="fas fa-spinner fa-spin"></i></div>';
+            modal.classList.add('show');
+
+            Promise.all([
+                fetch(`/api/server/${serverId}/metrics`).then(r => r.json()),
+                fetch(`/api/server/${serverId}/streams`).then(r => r.json()),
+                fetch(`/api/servers`).then(r => r.json())
+            ]).then(([metrics, streams, servers]) => {
+                const server = servers.find(s => s.id === serverId);
+                if (server) {
+                    modalTitle.textContent = server.hostname;
+                    modalBody.innerHTML = generateMobileServerDetails(server, metrics, streams);
+                }
+            }).catch(error => {
+                console.error('Error loading server details:', error);
+                modalBody.innerHTML = '<div class="text-center p-4 text-danger">Failed to load server details</div>';
+            });
+        }
+        
+        function closeMobileModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.remove('show');
+            }
+        }
+        
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `mobile-toast toast-${type}`;
+            toast.textContent = message;
+            
+            Object.assign(toast.style, {
+                position: 'fixed',
+                top: '80px',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                background: type === 'error' ? '#dc2626' : '#059669',
+                color: 'white',
+                padding: '12px 24px',
+                borderRadius: '8px',
+                zIndex: '1001',
+                fontSize: '14px',
+                fontWeight: '500',
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+                opacity: '0',
+                transition: 'opacity 0.3s ease'
+            });
+
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.opacity = '1';
+            }, 100);
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => {
+                    if (toast.parentNode) {
+                        toast.parentNode.removeChild(toast);
+                    }
+                }, 300);
+            }, 3000);
+        }
+        
+        // Use the same generateMobileServerDetails function from mobile-dashboard.js
+        function generateMobileServerDetails(server, metrics, streams) {
+            const latestMetric = metrics && metrics.length > 0 ? metrics[0] : {};
+            
+            return `
+                <div class="mobile-server-details">
+                    <div class="detail-section">
+                        <h6 class="detail-title">Server Information</h6>
+                        <div class="detail-grid">
+                            <div class="detail-item">
+                                <span class="detail-label">Address:</span>
+                                <span class="detail-value">${server.ip_address}:${server.port}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Role:</span>
+                                <span class="detail-value">${server.role}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Status:</span>
+                                <span class="detail-value status-${server.status}">${server.status.toUpperCase()}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">API Type:</span>
+                                <span class="detail-value">${server.api_type || 'N/A'}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="detail-section">
+                        <h6 class="detail-title">Current Metrics</h6>
+                        <div class="metrics-grid">
+                            <div class="metric-card">
+                                <div class="metric-value">${latestMetric.active_connections || 0}</div>
+                                <div class="metric-label">Connections</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-value">${latestMetric.stream_count || 0}</div>
+                                <div class="metric-label">Streams</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-value">${(latestMetric.bandwidth_in || 0).toFixed(1)} Mbps</div>
+                                <div class="metric-label">Bandwidth In</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-value">${(latestMetric.bandwidth_out || 0).toFixed(1)} Mbps</div>
+                                <div class="metric-label">Bandwidth Out</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    ${streams && streams.length > 0 ? `
+                        <div class="detail-section">
+                            <h6 class="detail-title">Active Streams (${streams.length})</h6>
+                            <div class="streams-list">
+                                ${streams.map(stream => `
+                                    <div class="stream-item">
+                                        <div class="stream-name">${stream.name || 'Unknown'}</div>
+                                        <div class="stream-info">
+                                            <span>${stream.clients || 0} viewers</span>
+                                            ${stream.video ? `<span>${stream.video.width}x${stream.video.height}</span>` : ''}
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+    </script>
+    
+    <style>
+        .page-title {
+            padding: var(--spacing-lg) var(--spacing-md) 0;
+        }
+        
+        .add-server-section {
+            padding: 0 var(--spacing-md) var(--spacing-lg);
+        }
+        
+        .mobile-card {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-light);
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .card-header {
+            padding: var(--spacing-lg);
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .card-title {
+            margin: 0;
+            font-weight: 600;
+            color: var(--dark-slate);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+        
+        .card-body {
+            padding: var(--spacing-lg);
+        }
+        
+        .btn-block {
+            width: 100%;
+        }
+        
+        .mobile-server-management-card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-md);
+            box-shadow: var(--shadow-light);
+        }
+        
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--spacing-sm) 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+        
+        .detail-label {
+            font-weight: 500;
+            color: var(--medium-gray);
+        }
+        
+        .detail-value {
+            font-weight: 600;
+            color: var(--dark-slate);
+        }
+        
+        .server-metrics-summary {
+            margin: var(--spacing-lg) 0;
+        }
+        
+        .metric-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-md);
+        }
+        
+        .action-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-sm);
+        }
+        
+        .btn-test {
+            background: var(--success-green);
+            color: white;
+        }
+        
+        .btn-edit {
+            background: var(--warning-orange);
+            color: white;
+        }
+        
+        .btn-delete {
+            background: var(--danger-red);
+            color: white;
+        }
+        
+        .btn-cancel {
+            background: var(--medium-gray);
+            color: white;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: var(--spacing-xl);
+            color: var(--medium-gray);
+        }
+        
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: var(--spacing-lg);
+            opacity: 0.3;
+        }
+        
+        .empty-message {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .empty-description {
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .modal-footer {
+            padding: var(--spacing-lg);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: var(--spacing-md);
+        }
+        
+        .modal-footer .btn {
+            flex: 1;
+        }
+    </style>
+</body>
+</html>

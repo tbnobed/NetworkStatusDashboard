@@ -143,6 +143,15 @@ def mobile_dashboard():
     
     return render_template('mobile_dashboard.html', servers=servers, alerts=recent_alerts, stats=stats)
 
+@app.route('/mobile/servers')
+def mobile_servers():
+    """Mobile server management view"""
+    servers = Server.query.all()
+    # Pre-fetch latest metrics for each server
+    for server in servers:
+        server.latest_metric = server.metrics.order_by(desc(ServerMetric.timestamp)).first()
+    return render_template('mobile_servers.html', servers=servers)
+
 @app.route('/servers')
 def servers():
     """Server management view"""
