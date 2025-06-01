@@ -15,13 +15,31 @@ def dashboard():
     
     # Check if this is a mobile device
     user_agent = request.headers.get('User-Agent', '').lower()
-    is_mobile = any(device in user_agent for device in [
-        'mobile', 'android', 'iphone', 'ipad', 'ipod', 'blackberry', 
-        'windows phone', 'opera mini', 'iemobile', 'fennec', 'webos',
-        'palm', 'symbian', 'tablet', 'kindle', 'silk', 'playbook'
-    ]) or any(pattern in user_agent for pattern in [
-        'mobi', 'phone', 'mini', 'nokia', 'samsung', 'htc', 'motorola'
-    ])
+    
+    # More comprehensive mobile detection
+    mobile_patterns = [
+        'mobile', 'android', 'iphone', 'ipad', 'ipod', 'blackberry',
+        'windows phone', 'windows mobile', 'opera mini', 'opera mobi',
+        'iemobile', 'fennec', 'webos', 'palm', 'symbian', 'tablet',
+        'kindle', 'silk', 'playbook', 'bb10', 'rim', 'meego'
+    ]
+    
+    mobile_brands = [
+        'mobi', 'phone', 'mini', 'nokia', 'samsung', 'htc', 'motorola',
+        'sony', 'lg', 'huawei', 'xiaomi', 'oppo', 'vivo', 'oneplus'
+    ]
+    
+    # Check for responsive design indicators
+    screen_hints = [
+        'max-width', 'orientation', 'touch'
+    ]
+    
+    is_mobile = (
+        any(pattern in user_agent for pattern in mobile_patterns) or
+        any(brand in user_agent for brand in mobile_brands) or
+        'mobile' in user_agent or
+        ('webkit' in user_agent and ('mobile' in user_agent or 'touch' in user_agent))
+    )
     
     # Debug logging
     app.logger.info(f"User-Agent: {request.headers.get('User-Agent', 'None')}")
