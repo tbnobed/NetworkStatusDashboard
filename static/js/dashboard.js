@@ -125,9 +125,16 @@ class CDNDashboard {
         if (!grid) return;
         
         servers.forEach(server => {
-            const serverCard = document.querySelector(`[data-server-id="${server.id}"]`);
+            // Update card view
+            const serverCard = grid.querySelector(`[data-server-id="${server.id}"]`);
             if (serverCard) {
                 this.updateServerCard(serverCard, server);
+            }
+            
+            // Update table view
+            const tableRow = document.querySelector(`#servers-table [data-server-id="${server.id}"]`);
+            if (tableRow) {
+                this.updateServerTableRow(tableRow, server);
             }
         });
     }
@@ -176,6 +183,53 @@ class CDNDashboard {
         if (bandwidthOutMetric && server.latest_metric) {
             const bandwidthOut = server.latest_metric.bandwidth_out || 0;
             bandwidthOutMetric.textContent = bandwidthOut.toFixed(2);
+        }
+    }
+    
+    updateServerTableRow(row, server) {
+        // Update status
+        const statusElement = row.querySelector('.server-status');
+        if (statusElement) {
+            statusElement.className = `server-status status-${server.status}`;
+            const statusIcon = statusElement.querySelector('i');
+            const statusText = statusElement.childNodes[statusElement.childNodes.length - 1];
+            if (statusIcon) {
+                statusIcon.className = `fas fa-${server.status === 'up' ? 'check-circle' : server.status === 'down' ? 'times-circle' : 'question-circle'}`;
+            }
+            if (statusText) {
+                statusText.textContent = ` ${server.status.toUpperCase()}`;
+            }
+        }
+        
+        // Update metrics
+        const connectionsMetric = row.querySelector('[data-metric="connections"]');
+        if (connectionsMetric && server.latest_metric) {
+            const connections = server.latest_metric.active_connections || 0;
+            connectionsMetric.textContent = connections;
+        }
+        
+        const streamCountMetric = row.querySelector('[data-metric="stream_count"]');
+        if (streamCountMetric && server.latest_metric) {
+            const streamCount = server.latest_metric.stream_count || 0;
+            streamCountMetric.textContent = streamCount;
+        }
+        
+        const bandwidthInMetric = row.querySelector('[data-metric="bandwidth_in"]');
+        if (bandwidthInMetric && server.latest_metric) {
+            const bandwidthIn = server.latest_metric.bandwidth_in || 0;
+            bandwidthInMetric.textContent = bandwidthIn.toFixed(2);
+        }
+        
+        const bandwidthOutMetric = row.querySelector('[data-metric="bandwidth_out"]');
+        if (bandwidthOutMetric && server.latest_metric) {
+            const bandwidthOut = server.latest_metric.bandwidth_out || 0;
+            bandwidthOutMetric.textContent = bandwidthOut.toFixed(2);
+        }
+        
+        const responseTimeMetric = row.querySelector('[data-metric="response_time"]');
+        if (responseTimeMetric && server.latest_metric && server.latest_metric.response_time) {
+            const responseTime = Math.round(server.latest_metric.response_time);
+            responseTimeMetric.textContent = responseTime + 'ms';
         }
     }
     
