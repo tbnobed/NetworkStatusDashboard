@@ -354,6 +354,15 @@ def check_server_alerts(server, metrics_data):
                     message=f'Server {server.hostname} is down and not responding to health checks.'
                 )
                 db.session.add(alert)
+                db.session.commit()
+                
+                # Send email notification for server down
+                try:
+                    from email_notifications import send_server_down_alert
+                    send_server_down_alert(server)
+                    logger.info(f'Server down email alert sent for {server.hostname}')
+                except Exception as e:
+                    logger.error(f'Failed to send server down email for {server.hostname}: {e}')
         
         # Check high CPU usage
         if metrics_data.get('cpu_usage') and metrics_data['cpu_usage'] > 80:
