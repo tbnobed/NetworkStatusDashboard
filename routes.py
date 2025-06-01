@@ -279,11 +279,27 @@ def delete_server(server_id):
         hostname = server.hostname
         db.session.delete(server)
         db.session.commit()
+        
+        # Check if this is an AJAX request (mobile interface)
+        if request.content_type == 'application/json' or 'application/json' in request.headers.get('Accept', ''):
+            return jsonify({
+                'success': True,
+                'message': f'Server {hostname} deleted successfully!'
+            })
+        
         flash(f'Server {hostname} deleted successfully!', 'success')
     except Exception as e:
         app.logger.error(f'Error deleting server: {str(e)}')
-        flash('An error occurred while deleting the server.', 'error')
         db.session.rollback()
+        
+        if request.content_type == 'application/json' or 'application/json' in request.headers.get('Accept', ''):
+            return jsonify({
+                'success': False,
+                'message': 'An error occurred while deleting the server',
+                'error': str(e)
+            })
+        
+        flash('An error occurred while deleting the server.', 'error')
     
     return redirect(url_for('servers'))
 
@@ -294,12 +310,31 @@ def test_server(server_id):
     
     try:
         result = test_server_connectivity(server)
+        
+        # Check if this is an AJAX request (mobile interface)
+        if request.content_type == 'application/json' or 'application/json' in request.headers.get('Accept', ''):
+            return jsonify({
+                'success': result['success'],
+                'message': f'Server {server.hostname} is {"reachable" if result["success"] else "not reachable"}',
+                'status': server.status,
+                'error': result.get('error', '')
+            })
+        
+        # Regular web form submission
         if result['success']:
             flash(f'Server {server.hostname} is reachable!', 'success')
         else:
             flash(f'Server {server.hostname} is not reachable: {result["error"]}', 'error')
     except Exception as e:
         app.logger.error(f'Error testing server connectivity: {str(e)}')
+        
+        if request.content_type == 'application/json' or 'application/json' in request.headers.get('Accept', ''):
+            return jsonify({
+                'success': False,
+                'message': 'An error occurred while testing the server',
+                'error': str(e)
+            })
+        
         flash('An error occurred while testing server connectivity.', 'error')
     
     return redirect(url_for('servers'))
