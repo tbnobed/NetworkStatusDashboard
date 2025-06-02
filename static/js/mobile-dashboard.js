@@ -414,11 +414,11 @@ function generateMobileServerDetails(server, metrics, streams) {
                                     </div>
                                     <div class="stream-metric">
                                         <i class="fas fa-download"></i>
-                                        <span>${((stream.kbps && stream.kbps.recv_30s) || 0 / 1000).toFixed(1)} Mbps</span>
+                                        <span>${(((stream.kbps && stream.kbps.recv_30s) || 0) / 1000).toFixed(1)} Mbps</span>
                                     </div>
                                     <div class="stream-metric">
                                         <i class="fas fa-upload"></i>
-                                        <span>${((stream.kbps && stream.kbps.send_30s) || 0 / 1000).toFixed(1)} Mbps</span>
+                                        <span>${(((stream.kbps && stream.kbps.send_30s) || 0) / 1000).toFixed(1)} Mbps</span>
                                     </div>
                                 </div>
 
@@ -547,21 +547,130 @@ function generateMobileServerDetails(server, metrics, streams) {
             }
             
             .stream-item {
-                padding: 0.75rem;
+                padding: 1rem;
                 background: var(--light-gray);
-                border-radius: 8px;
+                border-radius: 12px;
+                border-left: 4px solid var(--primary-blue);
+                margin-bottom: 1rem;
+            }
+            
+            .stream-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 0.75rem;
             }
             
             .stream-name {
                 font-weight: 600;
-                margin-bottom: 0.25rem;
+                font-size: 1rem;
+                color: var(--dark-slate);
             }
             
-            .stream-info {
-                font-size: 0.875rem;
-                color: var(--medium-gray);
+            .stream-status {
                 display: flex;
-                gap: 1rem;
+                align-items: center;
+                gap: 0.25rem;
+                font-size: 0.75rem;
+                font-weight: 600;
+                padding: 0.25rem 0.5rem;
+                border-radius: 4px;
+                text-transform: uppercase;
+            }
+            
+            .status-live {
+                background: #dcfce7;
+                color: #15803d;
+            }
+            
+            .status-offline {
+                background: #fef2f2;
+                color: #dc2626;
+            }
+            
+            .stream-metrics {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 0.5rem;
+                margin-bottom: 0.75rem;
+            }
+            
+            .stream-metric {
+                display: flex;
+                align-items: center;
+                gap: 0.25rem;
+                font-size: 0.75rem;
+                color: var(--medium-gray);
+            }
+            
+            .stream-metric i {
+                font-size: 0.875rem;
+                color: var(--primary-blue);
+            }
+            
+            .stream-details {
+                margin: 0.75rem 0;
+                padding: 0.5rem;
+                background: rgba(59, 130, 246, 0.05);
+                border-radius: 8px;
+            }
+            
+            .codec-info {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                margin-bottom: 0.5rem;
+                font-size: 0.875rem;
+            }
+            
+            .codec-info:last-child {
+                margin-bottom: 0;
+            }
+            
+            .codec-info i {
+                color: var(--primary-blue);
+                width: 16px;
+            }
+            
+            .codec-info small {
+                color: var(--medium-gray);
+                margin-left: auto;
+            }
+            
+            .stream-stats {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.5rem;
+                margin-top: 0.75rem;
+                padding-top: 0.75rem;
+                border-top: 1px solid #e5e7eb;
+            }
+            
+            .stat-item {
+                display: flex;
+                justify-content: space-between;
+                font-size: 0.75rem;
+            }
+            
+            .stat-label {
+                color: var(--medium-gray);
+            }
+            
+            .stat-value {
+                font-weight: 600;
+                color: var(--dark-slate);
+            }
+            
+            .no-streams {
+                text-align: center;
+                padding: 2rem;
+                color: var(--medium-gray);
+            }
+            
+            .no-streams i {
+                font-size: 2rem;
+                margin-bottom: 0.5rem;
+                opacity: 0.5;
             }
         </style>
     `;
