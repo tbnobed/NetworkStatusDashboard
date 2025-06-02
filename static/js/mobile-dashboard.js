@@ -336,10 +336,12 @@ function showMobileServerDetails(serverId) {
         fetch(`/api/servers/${serverId}/metrics`).then(r => r.json()),
         fetch(`/api/servers/${serverId}/streams`).then(r => r.json()),
         fetch(`/api/servers`).then(r => r.json())
-    ]).then(([metrics, streams, servers]) => {
+    ]).then(([metrics, streamsResponse, servers]) => {
         const server = servers.find(s => s.id === serverId);
         if (server) {
             modalTitle.textContent = server.hostname;
+            // Extract streams from the response object
+            const streams = streamsResponse.streams || [];
             modalBody.innerHTML = generateMobileServerDetails(server, metrics, streams);
         }
     }).catch(error => {
@@ -401,9 +403,9 @@ function generateMobileServerDetails(server, metrics, streams) {
                             <div class="stream-item">
                                 <div class="stream-header">
                                     <div class="stream-name">${stream.name || 'Unknown'}</div>
-                                    <div class="stream-status ${stream.publish && stream.publish.active ? 'status-live' : 'status-offline'}">
-                                        <i class="fas fa-${stream.publish && stream.publish.active ? 'broadcast-tower' : 'pause'}"></i>
-                                        ${stream.publish && stream.publish.active ? 'LIVE' : 'OFFLINE'}
+                                    <div class="stream-status ${stream.publish_active ? 'status-live' : 'status-offline'}">
+                                        <i class="fas fa-${stream.publish_active ? 'broadcast-tower' : 'pause'}"></i>
+                                        ${stream.publish_active ? 'LIVE' : 'OFFLINE'}
                                     </div>
                                 </div>
                                 
@@ -414,11 +416,11 @@ function generateMobileServerDetails(server, metrics, streams) {
                                     </div>
                                     <div class="stream-metric">
                                         <i class="fas fa-download"></i>
-                                        <span>${(((stream.kbps && stream.kbps.recv_30s) || 0) / 1000).toFixed(1)} Mbps</span>
+                                        <span>${((stream.bandwidth_in || 0) / 1000).toFixed(1)} Mbps</span>
                                     </div>
                                     <div class="stream-metric">
                                         <i class="fas fa-upload"></i>
-                                        <span>${(((stream.kbps && stream.kbps.send_30s) || 0) / 1000).toFixed(1)} Mbps</span>
+                                        <span>${((stream.bandwidth_out || 0) / 1000).toFixed(1)} Mbps</span>
                                     </div>
                                 </div>
 
@@ -448,7 +450,7 @@ function generateMobileServerDetails(server, metrics, streams) {
                                     </div>
                                     <div class="stat-item">
                                         <span class="stat-label">Uptime:</span>
-                                        <span class="stat-value">${formatStreamUptime(stream.live_ms)}</span>
+                                        <span class="stat-value">${formatStreamUptime(stream.live_time)}</span>
                                     </div>
                                     <div class="stat-item">
                                         <span class="stat-label">Data Sent:</span>
