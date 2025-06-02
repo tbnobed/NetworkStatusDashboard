@@ -395,20 +395,83 @@ function generateMobileServerDetails(server, metrics, streams) {
 
             ${streams && streams.length > 0 ? `
                 <div class="detail-section">
-                    <h6 class="detail-title">Active Streams (${streams.length})</h6>
+                    <h6 class="detail-title">Live Streams (${streams.length})</h6>
                     <div class="streams-list">
                         ${streams.map(stream => `
                             <div class="stream-item">
-                                <div class="stream-name">${stream.name || 'Unknown'}</div>
-                                <div class="stream-info">
-                                    <span>${stream.clients || 0} viewers</span>
-                                    ${stream.video ? `<span>${stream.video.width}x${stream.video.height}</span>` : ''}
+                                <div class="stream-header">
+                                    <div class="stream-name">${stream.name || 'Unknown'}</div>
+                                    <div class="stream-status ${stream.publish && stream.publish.active ? 'status-live' : 'status-offline'}">
+                                        <i class="fas fa-${stream.publish && stream.publish.active ? 'broadcast-tower' : 'pause'}"></i>
+                                        ${stream.publish && stream.publish.active ? 'LIVE' : 'OFFLINE'}
+                                    </div>
+                                </div>
+                                
+                                <div class="stream-metrics">
+                                    <div class="stream-metric">
+                                        <i class="fas fa-users"></i>
+                                        <span>${stream.clients || 0} viewers</span>
+                                    </div>
+                                    <div class="stream-metric">
+                                        <i class="fas fa-download"></i>
+                                        <span>${((stream.kbps && stream.kbps.recv_30s) || 0 / 1000).toFixed(1)} Mbps</span>
+                                    </div>
+                                    <div class="stream-metric">
+                                        <i class="fas fa-upload"></i>
+                                        <span>${((stream.kbps && stream.kbps.send_30s) || 0 / 1000).toFixed(1)} Mbps</span>
+                                    </div>
+                                </div>
+
+                                ${stream.video || stream.audio ? `
+                                    <div class="stream-details">
+                                        ${stream.video ? `
+                                            <div class="codec-info video-codec">
+                                                <i class="fas fa-video"></i>
+                                                <span>${stream.video.codec} ${stream.video.width}x${stream.video.height}</span>
+                                                <small>${stream.video.profile} L${stream.video.level}</small>
+                                            </div>
+                                        ` : ''}
+                                        ${stream.audio ? `
+                                            <div class="codec-info audio-codec">
+                                                <i class="fas fa-volume-up"></i>
+                                                <span>${stream.audio.codec} ${stream.audio.sample_rate}Hz</span>
+                                                <small>${stream.audio.channel}ch ${stream.audio.profile}</small>
+                                            </div>
+                                        ` : ''}
+                                    </div>
+                                ` : ''}
+
+                                <div class="stream-stats">
+                                    <div class="stat-item">
+                                        <span class="stat-label">Frames:</span>
+                                        <span class="stat-value">${(stream.frames || 0).toLocaleString()}</span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <span class="stat-label">Uptime:</span>
+                                        <span class="stat-value">${formatStreamUptime(stream.live_ms)}</span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <span class="stat-label">Data Sent:</span>
+                                        <span class="stat-value">${formatBytes(stream.send_bytes || 0)}</span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <span class="stat-label">Data Received:</span>
+                                        <span class="stat-value">${formatBytes(stream.recv_bytes || 0)}</span>
+                                    </div>
                                 </div>
                             </div>
                         `).join('')}
                     </div>
                 </div>
-            ` : ''}
+            ` : `
+                <div class="detail-section">
+                    <h6 class="detail-title">Streams</h6>
+                    <div class="no-streams">
+                        <i class="fas fa-broadcast-tower"></i>
+                        <p>No active streams</p>
+                    </div>
+                </div>
+            `}
         </div>
 
         <style>
@@ -548,6 +611,33 @@ function scrollToSection(sectionClass) {
     if (section) {
         section.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
+}
+
+function formatBytes(bytes) {
+    if (bytes === 0) return '0 B';
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+}
+
+function formatStreamUptime(liveMs) {
+    if (!liveMs) return '0s';
+    
+    const now = Date.now();
+    const uptimeMs = now - liveMs;
+    const seconds = Math.floor(uptimeMs / 1000);
+    
+    if (seconds < 60) return seconds + 's';
+    
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) return minutes + 'm ' + (seconds % 60) + 's';
+    
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return hours + 'h ' + (minutes % 60) + 'm';
+    
+    const days = Math.floor(hours / 24);
+    return days + 'd ' + (hours % 24) + 'h';
 }
 
 // Initialize mobile dashboard when DOM is loaded
