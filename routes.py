@@ -55,7 +55,7 @@ def dashboard():
         app.logger.info("Redirecting to mobile dashboard")
         return redirect(url_for('mobile_dashboard'))
     
-    servers = Server.query.all()
+    servers = Server.query.order_by(Server.hostname).all()
     recent_alerts = Alert.query.filter_by(acknowledged=False).order_by(desc(Alert.created_at)).limit(10).all()
     
     # Calculate summary statistics
@@ -102,7 +102,7 @@ def dashboard():
 @app.route('/mobile')
 def mobile_dashboard():
     """Mobile-optimized dashboard view"""
-    servers = Server.query.all()
+    servers = Server.query.order_by(Server.hostname).all()
     recent_alerts = Alert.query.filter_by(acknowledged=False).order_by(desc(Alert.created_at)).limit(5).all()
     
     # Calculate summary statistics
@@ -151,7 +151,7 @@ def mobile_dashboard():
 @app.route('/mobile/servers')
 def mobile_servers():
     """Mobile server management view"""
-    servers = Server.query.all()
+    servers = Server.query.order_by(Server.hostname).all()
     # Pre-fetch latest metrics for each server
     for server in servers:
         server.latest_metric = server.metrics.order_by(desc(ServerMetric.timestamp)).first()
@@ -160,7 +160,7 @@ def mobile_servers():
 @app.route('/servers')
 def servers():
     """Server management view"""
-    servers = Server.query.all()
+    servers = Server.query.order_by(Server.hostname).all()
     # Pre-fetch latest metrics for each server
     for server in servers:
         server.latest_metric = server.metrics.order_by(desc(ServerMetric.timestamp)).first()
@@ -347,7 +347,7 @@ def test_server(server_id):
 @app.route('/api/servers')
 def api_servers():
     """API endpoint to get all servers with their latest metrics"""
-    servers = Server.query.all()
+    servers = Server.query.order_by(Server.hostname).all()
     
     # Add latest metrics to each server
     server_data = []
@@ -447,7 +447,7 @@ def acknowledge_alert(alert_id):
 @app.route('/api/dashboard/stats')
 def api_dashboard_stats():
     """API endpoint for dashboard statistics"""
-    servers = Server.query.all()
+    servers = Server.query.order_by(Server.hostname).all()
     
     # Server status counts
     status_counts = {'up': 0, 'down': 0, 'unknown': 0}
