@@ -128,6 +128,28 @@ class CDNDashboard {
             }
         });
         
+        // Update offline servers status message and styling
+        const offlineCount = data.status_counts.down || 0;
+        const offlineCard = document.querySelector('#offline-servers').closest('.metric-card');
+        const offlineChangeElement = offlineCard?.querySelector('.metric-change');
+        
+        if (offlineChangeElement) {
+            const icon = offlineChangeElement.querySelector('i');
+            const textNode = offlineChangeElement.childNodes[offlineChangeElement.childNodes.length - 1];
+            
+            if (offlineCount > 0) {
+                // Server(s) are down - show alert
+                offlineChangeElement.className = 'metric-change negative';
+                icon.className = 'fas fa-exclamation-triangle';
+                textNode.textContent = offlineCount === 1 ? ' Server down' : ' Servers down';
+            } else {
+                // No issues
+                offlineChangeElement.className = 'metric-change neutral';
+                icon.className = 'fas fa-minus';
+                textNode.textContent = ' No issues';
+            }
+        }
+        
         // Update bandwidth stats with decimal values
         const totalBandwidthUpElement = document.getElementById('total-bandwidth-up');
         if (totalBandwidthUpElement && data.total_bandwidth_up !== undefined) {

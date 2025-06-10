@@ -58,9 +58,9 @@
                 </div>
             </div>
             <div class="metric-value" id="offline-servers">{{ stats.offline_servers }}</div>
-            <div class="metric-change neutral">
-                <i class="fas fa-minus"></i>
-                No issues
+            <div class="metric-change {% if stats.offline_servers > 0 %}negative{% else %}neutral{% endif %}">
+                <i class="fas fa-{% if stats.offline_servers > 0 %}exclamation-triangle{% else %}minus{% endif %}"></i>
+                {% if stats.offline_servers > 0 %}Server{{ 's' if stats.offline_servers != 1 }} down{% else %}No issues{% endif %}
             </div>
         </div>
     </div>
