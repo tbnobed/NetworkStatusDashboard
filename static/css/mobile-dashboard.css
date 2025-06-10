@@ -209,11 +209,34 @@ body {
   padding: var(--spacing-lg);
   margin-bottom: var(--spacing-md);
   box-shadow: var(--shadow-light);
-  transition: transform 0.2s ease;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  position: relative;
+}
+
+.mobile-server-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  transform: translateY(-1px);
 }
 
 .mobile-server-card:active {
   transform: scale(0.98);
+}
+
+.card-indicator {
+  position: absolute;
+  top: 50%;
+  right: var(--spacing-lg);
+  transform: translateY(-50%);
+  color: var(--medium-gray);
+  font-size: 1rem;
+  opacity: 0.6;
+  transition: all 0.2s ease;
+}
+
+.mobile-server-card:hover .card-indicator {
+  opacity: 1;
+  color: var(--primary-blue);
 }
 
 .server-header {

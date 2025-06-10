@@ -130,7 +130,7 @@
             
             <div class="mobile-servers" id="mobile-servers-list">
                 {% for server in servers %}
-                <div class="mobile-server-card" data-server-id="{{ server.id }}">
+                <div class="mobile-server-card" data-server-id="{{ server.id }}" onclick="showMobileServerDetails({{ server.id }})">
                     <div class="server-header">
                         <div class="server-name">{{ server.hostname }}</div>
                         <div class="server-status status-{{ server.status }}">
@@ -174,11 +174,8 @@
                         </div>
                     </div>
                     
-                    <div class="server-actions">
-                        <button class="btn btn-details" onclick="showMobileServerDetails({{ server.id }})">
-                            <i class="fas fa-info-circle"></i>
-                            Details
-                        </button>
+                    <div class="card-indicator">
+                        <i class="fas fa-chevron-right"></i>
                     </div>
                 </div>
                 {% endfor %}
