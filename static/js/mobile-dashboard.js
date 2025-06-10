@@ -320,29 +320,60 @@ function refreshMobileDashboard() {
 }
 
 function showMobileServerDetails(serverId) {
+    console.log('showMobileServerDetails called with serverId:', serverId);
+    
     const modal = document.getElementById('mobile-server-modal');
     const modalTitle = document.getElementById('mobile-modal-title');
     const modalBody = document.getElementById('mobile-modal-body');
 
-    if (!modal || !modalTitle || !modalBody) return;
+    if (!modal || !modalTitle || !modalBody) {
+        console.error('Modal elements not found:', { modal, modalTitle, modalBody });
+        return;
+    }
 
     // Show loading state
     modalTitle.textContent = 'Loading...';
     modalBody.innerHTML = '<div class="text-center p-4"><i class="fas fa-spinner fa-spin"></i></div>';
     modal.classList.add('show');
+    
+    console.log('Modal should now be visible');
 
     // Fetch server details
     Promise.all([
-        fetch(`/api/servers/${serverId}/metrics`).then(r => r.json()),
-        fetch(`/api/servers/${serverId}/streams`).then(r => r.json()),
-        fetch(`/api/servers`).then(r => r.json())
+        fetch(`/api/servers/${serverId}/metrics`).then(r => {
+            console.log('Metrics response status:', r.status);
+            return r.json();
+        }).catch(e => {
+            console.error('Metrics fetch error:', e);
+            return [];
+        }),
+        fetch(`/api/servers/${serverId}/streams`).then(r => {
+            console.log('Streams response status:', r.status);
+            return r.json();
+        }).catch(e => {
+            console.error('Streams fetch error:', e);
+            return { streams: [] };
+        }),
+        fetch(`/api/servers`).then(r => {
+            console.log('Servers response status:', r.status);
+            return r.json();
+        }).catch(e => {
+            console.error('Servers fetch error:', e);
+            return [];
+        })
     ]).then(([metrics, streamsResponse, servers]) => {
-        const server = servers.find(s => s.id === serverId);
+        console.log('API responses:', { metrics, streamsResponse, servers });
+        
+        const server = servers.find(s => s.id === parseInt(serverId));
         if (server) {
             modalTitle.textContent = server.hostname;
             // Extract streams from the response object
             const streams = streamsResponse.streams || [];
+            console.log('Found streams:', streams);
             modalBody.innerHTML = generateMobileServerDetails(server, metrics, streams);
+        } else {
+            console.error('Server not found with ID:', serverId);
+            modalBody.innerHTML = '<div class="text-center p-4 text-danger">Server not found</div>';
         }
     }).catch(error => {
         console.error('Error loading server details:', error);

@@ -536,7 +536,7 @@ body {
   padding: var(--spacing-lg);
   border-bottom: 1px solid var(--border-color);
   display: flex;
-  justify-content: between;
+  justify-content: space-between;
   align-items: center;
 }
 
