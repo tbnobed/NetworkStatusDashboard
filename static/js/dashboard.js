@@ -459,7 +459,7 @@ class CDNDashboard {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    ${streams.streams.map(stream => `
+                                    ${streams.streams.sort((a, b) => (a.name || '').localeCompare(b.name || '')).map(stream => `
                                         <tr>
                                             <td><strong>${this.escapeHtml(stream.name)}</strong></td>
                                             <td><code>${this.escapeHtml(stream.app)}</code></td>

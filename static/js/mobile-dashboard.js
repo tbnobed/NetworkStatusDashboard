@@ -430,7 +430,7 @@ function generateMobileServerDetails(server, metrics, streams) {
                 <div class="detail-section">
                     <h6 class="detail-title">Live Streams (${streams.length})</h6>
                     <div class="streams-list">
-                        ${streams.map(stream => `
+                        ${streams.sort((a, b) => (a.name || '').localeCompare(b.name || '')).map(stream => `
                             <div class="stream-item">
                                 <div class="stream-header">
                                     <div class="stream-name">${stream.name || 'Unknown'}</div>
