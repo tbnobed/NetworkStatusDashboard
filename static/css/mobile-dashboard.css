@@ -106,11 +106,6 @@ body {
   display: flex;
   align-items: center;
   gap: var(--spacing-md);
-  transition: transform 0.2s ease;
-}
-
-.status-card:active {
-  transform: scale(0.98);
 }
 
 .status-icon {
