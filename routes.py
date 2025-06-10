@@ -349,12 +349,51 @@ def api_servers():
     """API endpoint to get all servers with their latest metrics"""
     servers = Server.query.order_by(Server.hostname).all()
     
-    # Add latest metrics to each server
+    # Add latest metrics and streams to each server
     server_data = []
     for server in servers:
         server_dict = server.to_dict()
         latest_metric = server.metrics.order_by(desc(ServerMetric.timestamp)).first()
-        server_dict['latest_metrics'] = latest_metric.to_dict() if latest_metric else None
+        server_dict['latest_metric'] = latest_metric.to_dict() if latest_metric else None
+        
+        # Fetch current streams for this server
+        streams = []
+        try:
+            if server.api_endpoint and server.api_type == 'srs':
+                # Prepare authentication headers
+                headers = {}
+                auth = None
+                
+                if server.api_token:
+                    headers['Authorization'] = f'Bearer {server.api_token}'
+                elif server.api_username and server.api_password:
+                    auth = (server.api_username, server.api_password)
+                
+                # Get streams from SRS API
+                response = requests.get(f"{server.api_endpoint}/api/v1/streams", 
+                                      headers=headers, auth=auth, timeout=10)
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    if 'streams' in data:
+                        for stream in data['streams']:
+                            streams.append({
+                                'id': stream.get('id', ''),
+                                'name': stream.get('name', ''),
+                                'app': stream.get('app', ''),
+                                'url': stream.get('url', ''),
+                                'clients': stream.get('clients', 0),
+                                'frames': stream.get('frames', 0),
+                                'kbps': stream.get('kbps', {}),
+                                'video': stream.get('video', {}),
+                                'audio': stream.get('audio', {}),
+                                'publish': stream.get('publish', {}),
+                                'live_ms': stream.get('live_ms', 0)
+                            })
+        except Exception as e:
+            app.logger.debug(f'Error fetching streams for {server.hostname}: {str(e)}')
+        
+        server_dict['streams'] = streams
         server_data.append(server_dict)
     
     return jsonify(server_data)
