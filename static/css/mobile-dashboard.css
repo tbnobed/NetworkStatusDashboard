@@ -106,6 +106,14 @@ body {
   display: flex;
   align-items: center;
   gap: var(--spacing-md);
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  pointer-events: none;
 }
 
 .status-icon {
@@ -174,6 +182,14 @@ body {
   padding: var(--spacing-lg);
   box-shadow: var(--shadow-light);
   text-align: center;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  pointer-events: none;
 }
 
 .bandwidth-direction {
