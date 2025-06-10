@@ -20,7 +20,7 @@
 <!-- Summary Cards - Row 1 -->
 <div class="row mb-4">
     <div class="col-md-3 mb-3">
-        <div class="metric-card metric-primary slide-up">
+        <div class="metric-card metric-primary slide-up clickable-card" onclick="showServersList()">
             <div class="metric-header">
                 <h6 class="metric-title">Total Servers</h6>
                 <div class="metric-icon icon-primary">
@@ -35,7 +35,7 @@
         </div>
     </div>
     <div class="col-md-3 mb-3">
-        <div class="metric-card metric-success slide-up">
+        <div class="metric-card metric-success slide-up clickable-card" onclick="showOnlineServers()">
             <div class="metric-header">
                 <h6 class="metric-title">Online</h6>
                 <div class="metric-icon icon-success">
@@ -50,7 +50,7 @@
         </div>
     </div>
     <div class="col-md-3 mb-3">
-        <div class="metric-card metric-danger slide-up">
+        <div class="metric-card metric-danger slide-up clickable-card" onclick="showOfflineServers()">
             <div class="metric-header">
                 <h6 class="metric-title">Offline</h6>
                 <div class="metric-icon icon-danger">
@@ -65,7 +65,7 @@
         </div>
     </div>
     <div class="col-md-3 mb-3">
-        <div class="metric-card metric-info slide-up">
+        <div class="metric-card metric-info slide-up clickable-card" onclick="showStreamsList()">
             <div class="metric-header">
                 <h6 class="metric-title">Total Connections</h6>
                 <div class="metric-icon icon-info">
@@ -417,6 +417,21 @@
         </div>
     </div>
 </div>
+<!-- Metric Detail Modal -->
+<div id="metric-detail-modal" class="metric-detail-modal">
+    <div class="metric-detail-content">
+        <div class="metric-detail-header">
+            <h5 id="metric-detail-title" class="metric-detail-title">Server Details</h5>
+            <button class="metric-detail-close" onclick="closeMetricDetail()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div id="metric-detail-body" class="metric-detail-body">
+            <!-- Content will be populated by JavaScript -->
+        </div>
+    </div>
+</div>
+
 {% endblock %}
 
 {% block scripts %}
@@ -626,5 +641,306 @@ function acknowledgeAlert(alertId) {
         console.error('Error acknowledging alert:', error);
     });
 }
+
+// Interactive metric card functions
+function showServersList() {
+    fetch('/api/servers')
+        .then(response => response.json())
+        .then(servers => {
+            const title = `All Servers (${servers.length})`;
+            const content = generateServersListContent(servers);
+            showMetricDetail(title, content);
+        })
+        .catch(error => {
+            console.error('Error fetching servers:', error);
+        });
+}
+
+function showOnlineServers() {
+    fetch('/api/servers')
+        .then(response => response.json())
+        .then(servers => {
+            const onlineServers = servers.filter(server => server.status === 'up');
+            const title = `Online Servers (${onlineServers.length})`;
+            const content = generateOnlineServersContent(onlineServers);
+            showMetricDetail(title, content);
+        })
+        .catch(error => {
+            console.error('Error fetching servers:', error);
+        });
+}
+
+function showOfflineServers() {
+    fetch('/api/servers')
+        .then(response => response.json())
+        .then(servers => {
+            const offlineServers = servers.filter(server => server.status === 'down');
+            const title = `Offline Servers (${offlineServers.length})`;
+            const content = generateOfflineServersContent(offlineServers);
+            showMetricDetail(title, content);
+        })
+        .catch(error => {
+            console.error('Error fetching servers:', error);
+        });
+}
+
+function showStreamsList() {
+    fetch('/api/servers')
+        .then(response => response.json())
+        .then(servers => {
+            // Collect all streams from all servers
+            const allStreams = [];
+            let totalConnections = 0;
+            
+            servers.forEach(server => {
+                if (server.streams && server.streams.length > 0) {
+                    server.streams.forEach(stream => {
+                        stream.serverName = server.hostname;
+                        stream.serverStatus = server.status;
+                        totalConnections += stream.clients || 0;
+                        allStreams.push(stream);
+                    });
+                }
+            });
+            
+            const title = `All Streams - ${totalConnections} Total Connections`;
+            const content = generateStreamsListContent(allStreams);
+            showMetricDetail(title, content);
+        })
+        .catch(error => {
+            console.error('Error fetching streams:', error);
+        });
+}
+
+function generateServersListContent(servers) {
+    if (servers.length === 0) {
+        return '<p class="text-muted text-center">No servers configured</p>';
+    }
+    
+    // Sort servers alphabetically
+    servers.sort((a, b) => a.hostname.localeCompare(b.hostname));
+    
+    return servers.map(server => `
+        <div class="server-list-item">
+            <div class="server-item-header">
+                <div class="server-item-name">${escapeHtml(server.hostname)}</div>
+                <div class="server-item-status status-${server.status}">${server.status.toUpperCase()}</div>
+            </div>
+            <div class="server-item-details">
+                <div class="detail-item">
+                    <span class="detail-label">IP Address:</span>
+                    <span class="detail-value">${escapeHtml(server.ip_address)}:${server.port}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Role:</span>
+                    <span class="detail-value">${escapeHtml(server.role)}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">API Type:</span>
+                    <span class="detail-value">${escapeHtml(server.api_type || 'N/A')}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Connections:</span>
+                    <span class="detail-value">${server.latest_metric ? (server.latest_metric.active_connections || 0) : 0}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Streams:</span>
+                    <span class="detail-value">${server.latest_metric ? (server.latest_metric.stream_count || 0) : 0}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Response Time:</span>
+                    <span class="detail-value">${server.latest_metric && server.latest_metric.response_time ? Math.round(server.latest_metric.response_time) + 'ms' : 'N/A'}</span>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function generateOnlineServersContent(servers) {
+    if (servers.length === 0) {
+        return '<p class="text-muted text-center">No servers are currently online</p>';
+    }
+    
+    // Sort servers alphabetically
+    servers.sort((a, b) => a.hostname.localeCompare(b.hostname));
+    
+    return servers.map(server => `
+        <div class="server-list-item">
+            <div class="server-item-header">
+                <div class="server-item-name">${escapeHtml(server.hostname)}</div>
+                <div class="server-item-status status-up">ONLINE</div>
+            </div>
+            <div class="server-item-details">
+                <div class="detail-item">
+                    <span class="detail-label">CPU Usage:</span>
+                    <span class="detail-value">${server.latest_metric && server.latest_metric.cpu_usage ? server.latest_metric.cpu_usage.toFixed(2) + '%' : 'N/A'}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Memory Usage:</span>
+                    <span class="detail-value">${server.latest_metric && server.latest_metric.memory_usage ? server.latest_metric.memory_usage.toFixed(2) + '%' : 'N/A'}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Bandwidth In:</span>
+                    <span class="detail-value">${server.latest_metric && server.latest_metric.bandwidth_in ? server.latest_metric.bandwidth_in.toFixed(2) + ' Mbps' : 'N/A'}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Bandwidth Out:</span>
+                    <span class="detail-value">${server.latest_metric && server.latest_metric.bandwidth_out ? server.latest_metric.bandwidth_out.toFixed(2) + ' Mbps' : 'N/A'}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Active Connections:</span>
+                    <span class="detail-value">${server.latest_metric ? (server.latest_metric.active_connections || 0) : 0}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Active Streams:</span>
+                    <span class="detail-value">${server.latest_metric ? (server.latest_metric.stream_count || 0) : 0}</span>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function generateOfflineServersContent(servers) {
+    if (servers.length === 0) {
+        return '<p class="text-muted text-center">All servers are online</p>';
+    }
+    
+    // Sort servers alphabetically
+    servers.sort((a, b) => a.hostname.localeCompare(b.hostname));
+    
+    return servers.map(server => `
+        <div class="server-list-item">
+            <div class="server-item-header">
+                <div class="server-item-name">${escapeHtml(server.hostname)}</div>
+                <div class="server-item-status status-down">OFFLINE</div>
+            </div>
+            <div class="server-item-details">
+                <div class="detail-item">
+                    <span class="detail-label">IP Address:</span>
+                    <span class="detail-value">${escapeHtml(server.ip_address)}:${server.port}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Role:</span>
+                    <span class="detail-value">${escapeHtml(server.role)}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Last Response:</span>
+                    <span class="detail-value">${server.latest_metric && server.latest_metric.timestamp ? formatDate(server.latest_metric.timestamp) : 'Never'}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Last Response Time:</span>
+                    <span class="detail-value">${server.latest_metric && server.latest_metric.response_time ? Math.round(server.latest_metric.response_time) + 'ms' : 'N/A'}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Error Count:</span>
+                    <span class="detail-value">${server.latest_metric ? (server.latest_metric.error_count || 0) : 0}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Status:</span>
+                    <span class="detail-value">Connection Failed</span>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function generateStreamsListContent(streams) {
+    if (streams.length === 0) {
+        return '<p class="text-muted text-center">No active streams</p>';
+    }
+    
+    // Sort streams alphabetically by name
+    streams.sort((a, b) => a.name.localeCompare(b.name));
+    
+    return streams.map(stream => `
+        <div class="stream-list-item">
+            <div class="stream-item-header">
+                <div class="stream-item-name">${escapeHtml(stream.name)}</div>
+                <div class="stream-item-status status-up">LIVE</div>
+            </div>
+            <div class="stream-item-details">
+                <div class="detail-item">
+                    <span class="detail-label">Server:</span>
+                    <span class="detail-value">${escapeHtml(stream.serverName)}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Clients:</span>
+                    <span class="detail-value">${stream.clients || 0}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Receive Rate:</span>
+                    <span class="detail-value">${stream.kbps && stream.kbps.recv_30s ? (stream.kbps.recv_30s / 1000).toFixed(2) + ' Mbps' : 'N/A'}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Send Rate:</span>
+                    <span class="detail-value">${stream.kbps && stream.kbps.send_30s ? (stream.kbps.send_30s / 1000).toFixed(2) + ' Mbps' : 'N/A'}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Video:</span>
+                    <span class="detail-value">${stream.video ? `${stream.video.width}x${stream.video.height} ${stream.video.codec}` : 'N/A'}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Uptime:</span>
+                    <span class="detail-value">${stream.live_ms ? formatStreamUptime(stream.live_ms) : 'N/A'}</span>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function showMetricDetail(title, content) {
+    document.getElementById('metric-detail-title').textContent = title;
+    document.getElementById('metric-detail-body').innerHTML = content;
+    document.getElementById('metric-detail-modal').style.display = 'flex';
+}
+
+function closeMetricDetail() {
+    document.getElementById('metric-detail-modal').style.display = 'none';
+}
+
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleString();
+}
+
+function formatStreamUptime(liveMs) {
+    const now = Date.now();
+    const uptimeMs = now - liveMs;
+    const seconds = Math.floor(uptimeMs / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
+    
+    if (days > 0) {
+        return `${days}d ${hours % 24}h ${minutes % 60}m`;
+    } else if (hours > 0) {
+        return `${hours}h ${minutes % 60}m`;
+    } else if (minutes > 0) {
+        return `${minutes}m ${seconds % 60}s`;
+    } else {
+        return `${seconds}s`;
+    }
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// Close modal when clicking outside
+document.addEventListener('click', function(event) {
+    const modal = document.getElementById('metric-detail-modal');
+    if (event.target === modal) {
+        closeMetricDetail();
+    }
+});
+
+// Close modal with Escape key
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        closeMetricDetail();
+    }
+});
 </script>
 {% endblock %}
