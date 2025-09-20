@@ -157,11 +157,31 @@ thead.table-light th,
   border-color: #4b5563 !important; /* Medium gray borders */
 }
 
-/* Override Bootstrap table-light completely */
+/* Override Bootstrap table-light completely - MAXIMUM SPECIFICITY */
 .table > thead.table-light > tr > th {
   background-color: #374151 !important;
   color: #f7fafc !important;
   border-color: #4b5563 !important;
+}
+
+/* Nuclear option - override ANY table header with table-light */
+table.table thead.table-light th,
+table.table > thead.table-light > tr > th,
+.table-responsive .table thead.table-light th,
+.table-responsive > .table > thead.table-light > tr > th,
+.card-body .table thead.table-light th,
+.card-body > .table > thead.table-light > tr > th {
+  background-color: #1f2937 !important; /* Very dark gray */  
+  color: #ffffff !important; /* Pure white text */
+  border-color: #374151 !important; /* Dark border */
+  font-weight: 600 !important;
+}
+
+/* Just in case - force all th elements in tables to be dark */
+.table th {
+  background-color: #1f2937 !important;
+  color: #ffffff !important;
+  border-color: #374151 !important;
 }
 
 /* Card headers dark theme */
