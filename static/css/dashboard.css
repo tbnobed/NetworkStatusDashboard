@@ -120,6 +120,64 @@
   color: #f7fafc !important; /* Force bright white */
 }
 
+/* Table dark theme overrides - Critical for visibility */
+.table {
+  background-color: var(--bg-primary) !important;
+  color: #f7fafc !important;
+}
+
+.table thead th {
+  background-color: var(--gray-200) !important;
+  color: #f7fafc !important;
+  border-color: var(--gray-300) !important;
+  font-weight: 600;
+}
+
+.table tbody td {
+  border-color: var(--gray-200) !important;
+}
+
+.table-hover tbody tr:hover {
+  background-color: rgba(255,255,255,0.04) !important;
+}
+
+.table-light, .thead-light {
+  background-color: var(--gray-200) !important;
+  color: #f7fafc !important;
+  border-color: var(--gray-300) !important;
+}
+
+/* Card headers dark theme */
+.card-header {
+  background-color: var(--bg-primary) !important;
+  color: #f7fafc !important;
+  border-bottom: 1px solid var(--gray-200) !important;
+}
+
+/* Modal dark theme */
+.modal-content {
+  background-color: var(--bg-primary) !important;
+  color: #f7fafc !important;
+  border-color: var(--gray-200) !important;
+}
+
+.modal-header, .modal-footer {
+  border-color: var(--gray-200) !important;
+}
+
+/* Form controls for dark theme consistency */
+.form-control, .form-select {
+  background-color: var(--bg-tertiary) !important;
+  color: #f7fafc !important;
+  border-color: var(--gray-300) !important;
+}
+
+.dropdown-menu {
+  background-color: var(--bg-primary) !important;
+  color: #f7fafc !important;
+  border-color: var(--gray-200) !important;
+}
+
 /* Navigation bar muted colors */
 .navbar-dark.bg-primary {
   background-color: var(--gray-100) !important;
