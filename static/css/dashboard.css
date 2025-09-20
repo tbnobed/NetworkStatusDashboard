@@ -392,7 +392,19 @@ h6 { font-size: 0.875rem; }
   backdrop-filter: blur(10px);
   border: none;
   box-shadow: var(--shadow-lg);
-  padding: var(--spacing-md) 0;
+  padding: 0.5rem 0; /* Reduced padding around navbar */
+}
+
+/* Remove extra spacing around logo */
+.navbar-brand {
+  margin-right: 1rem !important;
+  padding: 0 !important;
+}
+
+/* Make navbar container more compact */
+.navbar .container {
+  padding-top: 0.25rem !important;
+  padding-bottom: 0.25rem !important;
 }
 
 .navbar-brand {
