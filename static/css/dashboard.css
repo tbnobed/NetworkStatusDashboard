@@ -237,6 +237,20 @@ div.table-responsive table.table thead tr th {
   border-color: var(--gray-200) !important;
 }
 
+/* Footer dark theme */
+footer, .bg-light {
+  background-color: #1f2937 !important; /* Dark footer background */
+  color: #ffffff !important;
+}
+
+footer .text-muted {
+  color: #9ca3af !important; /* Light gray text for muted content */
+}
+
+footer small.text-muted {
+  color: #9ca3af !important;
+}
+
 /* Navigation bar muted colors */
 .navbar-dark.bg-primary {
   background-color: var(--gray-100) !important;
