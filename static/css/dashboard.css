@@ -335,7 +335,14 @@ h6 { font-size: 0.875rem; }
 
 /* Hide metric change row to make cards only use 2 rows */
 .metric-change {
-  display: none;
+  display: none !important;
+}
+
+/* Additional targeting for all metric change variations */
+.metric-change.positive,
+.metric-change.negative, 
+.metric-change.neutral {
+  display: none !important;
 }
 
 /* Metric Detail Modal */
