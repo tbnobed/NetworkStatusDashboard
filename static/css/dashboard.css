@@ -109,6 +109,17 @@
   color: var(--text-primary) !important;
 }
 
+/* Comprehensive header visibility overrides */
+.chart-title,
+.dashboard-title,
+.dashboard-subtitle,
+.metric-title,
+.server-title,
+.card-title,
+.section-title {
+  color: #f7fafc !important; /* Force bright white */
+}
+
 /* Navigation bar muted colors */
 .navbar-dark.bg-primary {
   background-color: var(--gray-100) !important;
@@ -174,6 +185,7 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 600;
   line-height: 1.25;
   margin-bottom: var(--spacing-md);
+  color: #f7fafc !important; /* Bright white for visibility */
 }
 
 h1 { font-size: 2rem; }
