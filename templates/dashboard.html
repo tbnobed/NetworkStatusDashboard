@@ -828,16 +828,16 @@ function generateOfflineServersContent(servers) {
                     <span class="detail-value danger">${server.latest_metric && server.latest_metric.timestamp ? formatDate(server.latest_metric.timestamp) : 'Never'}</span>
                 </div>
                 <div class="detail-item">
-                    <span class="detail-label">Last Response Time</span>
-                    <span class="detail-value ${server.latest_metric && server.latest_metric.response_time ? 'warning' : 'danger'}">${server.latest_metric && server.latest_metric.response_time ? Math.round(server.latest_metric.response_time) + 'ms' : 'N/A'}</span>
-                </div>
-                <div class="detail-item">
                     <span class="detail-label">Error Count</span>
                     <span class="detail-value danger">${server.latest_metric ? (server.latest_metric.error_count || 0) : 0}</span>
                 </div>
                 <div class="detail-item">
                     <span class="detail-label">Connection Status</span>
                     <span class="detail-value danger">Connection Failed</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">API Type</span>
+                    <span class="detail-value">${escapeHtml(server.api_type || 'N/A').toUpperCase()}</span>
                 </div>
             </div>
         </div>
