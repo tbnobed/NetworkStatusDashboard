@@ -278,6 +278,27 @@ small.form-text, small.text-muted {
   color: #d1d5db !important;
 }
 
+/* Full width layout - use all available screen space */
+.container {
+  max-width: 100% !important;
+  padding-left: 2rem !important;
+  padding-right: 2rem !important;
+}
+
+/* Navigation container also full width */
+.navbar .container {
+  max-width: 100% !important;
+  padding-left: 2rem !important;
+  padding-right: 2rem !important;
+}
+
+/* Footer container full width */
+footer .container {
+  max-width: 100% !important;
+  padding-left: 2rem !important;
+  padding-right: 2rem !important;
+}
+
 /* Navigation bar muted colors */
 .navbar-dark.bg-primary {
   background-color: var(--gray-100) !important;
