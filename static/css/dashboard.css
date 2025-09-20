@@ -251,6 +251,33 @@ footer small.text-muted {
   color: #9ca3af !important;
 }
 
+/* Form labels and descriptions light colors */
+label, .form-label {
+  color: #f7fafc !important; /* Bright white for labels */
+}
+
+.form-text, .form-text.text-muted {
+  color: #d1d5db !important; /* Light gray for help text */
+}
+
+small.form-text, small.text-muted {
+  color: #d1d5db !important; /* Light gray for small descriptions */
+}
+
+.form-group label {
+  color: #f7fafc !important;
+}
+
+/* Input placeholder text */
+.form-control::placeholder {
+  color: #9ca3af !important; /* Light gray placeholder */
+}
+
+/* Any remaining text-muted that should be light */
+.text-muted:not(footer .text-muted) {
+  color: #d1d5db !important;
+}
+
 /* Navigation bar muted colors */
 .navbar-dark.bg-primary {
   background-color: var(--gray-100) !important;
