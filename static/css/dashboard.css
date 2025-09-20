@@ -122,23 +122,34 @@
 
 /* Table dark theme overrides - Critical for visibility */
 .table {
-  background-color: var(--bg-primary) !important;
-  color: #f7fafc !important;
+  background-color: #1f2937 !important; /* Dark table background */
+  color: #ffffff !important; /* White text */
 }
 
 .table thead th {
-  background-color: var(--gray-200) !important;
-  color: #f7fafc !important;
-  border-color: var(--gray-300) !important;
+  background-color: #374151 !important; /* Darker header background */
+  color: #ffffff !important; /* White header text */
+  border-color: #4b5563 !important;
   font-weight: 600;
 }
 
 .table tbody td {
-  border-color: var(--gray-200) !important;
+  background-color: #1f2937 !important; /* Dark cell background */
+  color: #ffffff !important; /* White cell text */
+  border-color: #374151 !important;
+}
+
+.table tbody tr {
+  background-color: #1f2937 !important; /* Dark row background */
 }
 
 .table-hover tbody tr:hover {
-  background-color: rgba(255,255,255,0.04) !important;
+  background-color: #374151 !important; /* Darker on hover */
+}
+
+.table-hover tbody tr:hover td {
+  background-color: #374151 !important; /* Darker cells on hover */
+  color: #ffffff !important;
 }
 
 .table-light, .thead-light {
