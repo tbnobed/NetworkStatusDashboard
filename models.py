@@ -92,7 +92,7 @@ class ServerMetric(db.Model):
 
 class Alert(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    server_id = db.Column(db.Integer, db.ForeignKey('server.id'), nullable=False)
+    server_id = db.Column(db.Integer, db.ForeignKey('server.id'), nullable=True)
     alert_type = db.Column(db.String(50), nullable=False)  # cpu_high, memory_high, connection_down, etc.
     severity = db.Column(db.String(20), default='warning')  # info, warning, error, critical
     message = db.Column(db.Text, nullable=False)
@@ -100,8 +100,8 @@ class Alert(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     acknowledged_at = db.Column(db.DateTime)
     
-    # Relationship to server
-    server = db.relationship('Server', backref='alerts')
+    # Relationship to server with cascade delete
+    server = db.relationship('Server', backref=db.backref('alerts', cascade='all, delete-orphan'))
     
     def __repr__(self):
         return f'<Alert {self.alert_type} for {self.server_id}>'
