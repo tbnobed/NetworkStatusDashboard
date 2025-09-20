@@ -282,6 +282,15 @@ def delete_server(server_id):
     
     try:
         hostname = server.hostname
+        
+        # First, handle any alerts associated with this server
+        # Set server_id to NULL for historical alerts (preserve alert history)
+        Alert.query.filter_by(server_id=server_id).update({'server_id': None})
+        
+        # Delete all metrics for this server
+        ServerMetric.query.filter_by(server_id=server_id).delete()
+        
+        # Now delete the server
         db.session.delete(server)
         db.session.commit()
         
