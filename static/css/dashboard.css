@@ -264,7 +264,7 @@ h6 { font-size: 0.875rem; }
 }
 
 .dashboard-title {
-  color: var(--text-primary);
+  color: var(--gray-800);
   font-size: 1.875rem;
   font-weight: 700;
   margin-bottom: var(--spacing-sm);
@@ -274,7 +274,7 @@ h6 { font-size: 0.875rem; }
 }
 
 .dashboard-subtitle {
-  color: var(--text-secondary);
+  color: var(--gray-700);
   font-size: 1rem;
   font-weight: 400;
   margin-bottom: 0;
@@ -686,7 +686,7 @@ h6 { font-size: 0.875rem; }
 .server-title {
   font-size: 1.125rem;
   font-weight: 600;
-  color: var(--text-primary);
+  color: var(--gray-800);
   margin: 0;
   line-height: 1.2;
 }
@@ -862,13 +862,13 @@ h6 { font-size: 0.875rem; }
 .chart-title {
   font-size: 1.125rem;
   font-weight: 600;
-  color: var(--text-primary);
+  color: var(--gray-800);
   margin: 0;
 }
 
 .chart-subtitle {
   font-size: 0.875rem;
-  color: var(--text-secondary);
+  color: var(--gray-700);
   margin: 0;
 }
 
