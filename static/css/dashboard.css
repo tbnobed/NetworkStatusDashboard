@@ -65,6 +65,100 @@
   --font-mono: 'JetBrains Mono', 'Fira Code', 'Monaco', 'Consolas', monospace;
 }
 
+/* Override Bootstrap bright colors with muted dark theme */
+.bg-success {
+  background-color: var(--success-green) !important;
+}
+
+.bg-primary {
+  background-color: var(--primary-blue) !important;
+}
+
+.bg-warning {
+  background-color: var(--warning-amber) !important;
+}
+
+.bg-danger {
+  background-color: var(--danger-red) !important;
+}
+
+.bg-info {
+  background-color: var(--secondary-indigo) !important;
+}
+
+/* Text color overrides for consistency */
+.text-primary {
+  color: var(--text-primary) !important;
+}
+
+.text-secondary {
+  color: var(--text-secondary) !important;
+}
+
+.text-muted {
+  color: var(--text-muted) !important;
+}
+
+/* Card overrides */
+.card {
+  background-color: var(--bg-primary) !important;
+  border-color: var(--gray-200) !important;
+}
+
+.card-body {
+  color: var(--text-primary) !important;
+}
+
+/* Navigation bar muted colors */
+.navbar-dark.bg-primary {
+  background-color: var(--gray-100) !important;
+  border-bottom: 1px solid var(--gray-200);
+}
+
+/* Bootstrap button overrides for muted dark theme */
+.btn-primary {
+  background-color: var(--primary-blue) !important;
+  border-color: var(--primary-blue-dark) !important;
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-blue-light) !important;
+  border-color: var(--primary-blue) !important;
+}
+
+.btn-success {
+  background-color: var(--success-green) !important;
+  border-color: var(--success-green-light) !important;
+}
+
+.btn-warning {
+  background-color: var(--warning-amber) !important;
+  border-color: var(--warning-amber-light) !important;
+}
+
+.btn-danger {
+  background-color: var(--danger-red) !important;
+  border-color: var(--danger-red-light) !important;
+}
+
+.btn-info {
+  background-color: var(--secondary-indigo) !important;
+  border-color: var(--secondary-purple) !important;
+}
+
+/* Outline button overrides */
+.btn-outline-primary {
+  color: var(--text-primary) !important;
+  border-color: var(--gray-300) !important;
+  background-color: transparent !important;
+}
+
+.btn-outline-primary:hover {
+  color: var(--text-primary) !important;
+  background-color: var(--gray-200) !important;
+  border-color: var(--gray-400) !important;
+}
+
 /* Typography */
 body {
   font-family: var(--font-sans);
@@ -556,8 +650,8 @@ h6 { font-size: 0.875rem; }
 
 .server-card.status-down {
   border-color: var(--danger-red);
-  background: rgba(220, 38, 38, 0.03);
-  box-shadow: 0 0 0 1px rgba(220, 38, 38, 0.1), var(--shadow-sm);
+  background: rgba(107, 74, 74, 0.08);
+  box-shadow: 0 0 0 1px rgba(107, 74, 74, 0.15), var(--shadow-sm);
 }
 
 .server-card.status-down .server-title {
