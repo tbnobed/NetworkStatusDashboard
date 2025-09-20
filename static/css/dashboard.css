@@ -184,6 +184,17 @@ table.table > thead.table-light > tr > th,
   border-color: #374151 !important;
 }
 
+/* Specific targeting for dashboard servers table */
+#servers-table .table thead th,
+#servers-table table thead th,
+.table-responsive .table thead th,
+div.table-responsive table.table thead tr th {
+  background-color: #1f2937 !important;
+  color: #ffffff !important;
+  border-color: #374151 !important;
+  font-weight: 600 !important;
+}
+
 /* Card headers dark theme */
 .card-header {
   background-color: var(--bg-primary) !important;
